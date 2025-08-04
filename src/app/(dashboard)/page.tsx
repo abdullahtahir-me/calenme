@@ -1,12 +1,3 @@
-
-
-export default function Home() {
-  return (
-  <>
-    <h1>
-      hello
-    </h1>
-  </>
-  )
+export default function Dashboard(){
+    return <h1>Hello</h1>
 }
-

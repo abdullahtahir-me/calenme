@@ -47,7 +47,7 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <Sidebar collapsible="icon" variant="sidebar" className="top-(--header-height) h-[calc(100svh-var(--header-height))]!">
+    <Sidebar collapsible="icon" variant="inset" className="top-(--header-height) h-[calc(100svh-var(--header-height))]!">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent className="mt-4">
