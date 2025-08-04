@@ -1,3 +1,8 @@
-export default function Dashboard(){
-    return <h1>Hello</h1>
+import { Assignments } from "./assignments";
+import { Courses } from "./courses";
+import DashboardContent from "./dashboard";
+import Tasks from './tasks'
+
+export default function Dashboard() {
+  return <Assignments />
 }
