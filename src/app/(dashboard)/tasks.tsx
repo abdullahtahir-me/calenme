@@ -75,18 +75,18 @@ export default function Tasks() {
 
   const [filter, setFilter] = useState("all");
   const [newTask, setNewTask] = useState<{
-  title: string;
-  description: string;
-  course: string;
-  priority: Priority;
-  dueDate: string;
-}>({
-  title: "",
-  description: "",
-  course: "",
-  priority: "medium",
-  dueDate: "",
-});
+    title: string;
+    description: string;
+    course: string;
+    priority: Priority;
+    dueDate: string;
+  }>({
+    title: "",
+    description: "",
+    course: "",
+    priority: "medium",
+    dueDate: "",
+  });
 
   const toggleTask = (id: number) => {
     setTasks(

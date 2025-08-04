@@ -22,8 +22,8 @@ body {
    * Tailwind will use these values to generate utility classes.
    */
   --color-bg: #f1f3f5;
-  --color-surface: #FFFFFF;
-  --color-border: #E5E7EB;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
   --color-text: #1f1f1f;
   --color-muted: #868e96;
   --color-primary: #228be6;
@@ -41,23 +41,23 @@ body {
    * They override the light theme values defined above.
    */
   .dark {
-    --color-bg: #1A1B1E;
-    --color-surface: #25262B;
-    --color-border: #4D4E53;
-    --color-text: #EBEBEB;
-    --color-muted: #949BA2;
-    --color-primary: #70A5FF;
+    --color-bg: #1a1b1e;
+    --color-surface: #25262b;
+    --color-border: #4d4e53;
+    --color-text: #ebebeb;
+    --color-muted: #949ba2;
+    --color-primary: #70a5ff;
     --color-primary-hov: #3e73d0;
-    --color-secondary: #90B0FF;
-    --color-success: #60D060;
-    --color-warning: #FDD47F;
-    --color-error: #FF6666;
+    --color-secondary: #90b0ff;
+    --color-success: #60d060;
+    --color-warning: #fdd47f;
+    --color-error: #ff6666;
   }
 }
 
-@layer components{
-  .btn{
-    @apply bg-primary text-text flex items-center justify-center px-2.5 py-1 mx-2 my-1 rounded-md hover:bg-primary-hov transition-all
+@layer components {
+  .btn {
+    @apply bg-primary text-text flex items-center justify-center px-2.5 py-1 mx-2 my-1 rounded-md hover:bg-primary-hov transition-all;
   }
 }
 

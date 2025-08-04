@@ -84,10 +84,7 @@ export function Courses() {
     },
   ];
 
-  const totalCredits = courses.reduce(
-    (sum, course) => sum + course.credits,
-    0,
-  );
+  const totalCredits = courses.reduce((sum, course) => sum + course.credits, 0);
   const averageGrade =
     courses.reduce((sum, course) => {
       const gradePoints = {
@@ -99,22 +96,19 @@ export function Courses() {
         "C+": 2.3,
         C: 2.0,
       };
-      return (
-        sum +
-        (gradePoints[
-          course.grade as keyof typeof gradePoints
-        ] || 0)
-      );
+      return sum + (gradePoints[course.grade as keyof typeof gradePoints] || 0);
     }, 0) / courses.length;
 
   const formatNextClass = (dateString: string) => {
     const date = new Date(dateString);
     const today = new Date();
-    const isToday =
-      date.toDateString() === today.toDateString();
+    const isToday = date.toDateString() === today.toDateString();
 
     if (isToday) {
-      return `Today at ${date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+      return `Today at ${date.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      })}`;
     }
     return date.toLocaleDateString([], {
       month: "short",
@@ -127,8 +121,7 @@ export function Courses() {
       <div>
         <h1>Courses</h1>
         <p className="text-muted-foreground">
-          Manage your enrolled courses and track academic
-          progress.
+          Manage your enrolled courses and track academic progress.
         </p>
       </div>
 
@@ -140,9 +133,7 @@ export function Courses() {
               <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">
-                Total Courses
-              </p>
+              <p className="text-sm text-muted-foreground">Total Courses</p>
               <p className="font-semibold">{courses.length}</p>
             </div>
           </div>
@@ -154,9 +145,7 @@ export function Courses() {
               <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">
-                Total Credits
-              </p>
+              <p className="text-sm text-muted-foreground">Total Credits</p>
               <p className="font-semibold">{totalCredits}</p>
             </div>
           </div>
@@ -168,12 +157,8 @@ export function Courses() {
               <Award className="h-5 w-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">
-                GPA
-              </p>
-              <p className="font-semibold">
-                {averageGrade.toFixed(2)}
-              </p>
+              <p className="text-sm text-muted-foreground">GPA</p>
+              <p className="font-semibold">{averageGrade.toFixed(2)}</p>
             </div>
           </div>
         </Card>
@@ -184,12 +169,8 @@ export function Courses() {
               <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">
-                Next Class
-              </p>
-              <p className="font-semibold text-xs">
-                In 2 hours
-              </p>
+              <p className="text-sm text-muted-foreground">Next Class</p>
+              <p className="font-semibold text-xs">In 2 hours</p>
             </div>
           </div>
         </Card>
@@ -203,14 +184,10 @@ export function Courses() {
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <div
-                      className={`w-3 h-3 rounded-full ${course.color}`}
-                    />
+                    <div className={`w-3 h-3 rounded-full ${course.color}`} />
                     <h3>{course.name}</h3>
                   </div>
-                  <p className="text-muted-foreground">
-                    {course.code}
-                  </p>
+                  <p className="text-muted-foreground">{course.code}</p>
                   <p className="text-sm text-muted-foreground">
                     {course.instructor}
                   </p>
@@ -222,8 +199,8 @@ export function Courses() {
                       course.grade.startsWith("A")
                         ? "default"
                         : course.grade.startsWith("B")
-                          ? "secondary"
-                          : "outline"
+                        ? "secondary"
+                        : "outline"
                     }
                   >
                     {course.grade}
@@ -236,29 +213,19 @@ export function Courses() {
 
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    Schedule:
-                  </span>
+                  <span className="text-muted-foreground">Schedule:</span>
                   <span>{course.schedule}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    Room:
-                  </span>
+                  <span className="text-muted-foreground">Room:</span>
                   <span>{course.room}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    Next Class:
-                  </span>
-                  <span>
-                    {formatNextClass(course.nextClass)}
-                  </span>
+                  <span className="text-muted-foreground">Next Class:</span>
+                  <span>{formatNextClass(course.nextClass)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    Assignments:
-                  </span>
+                  <span className="text-muted-foreground">Assignments:</span>
                   <span>{course.assignments} total</span>
                 </div>
               </div>
