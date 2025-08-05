@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "A way to organize the life",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;

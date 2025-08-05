@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, FileText, Clock } from "lucide-react";
 
-export function Assignments() {
+export default function Assignments() {
   const assignments = [
     {
       id: 1,

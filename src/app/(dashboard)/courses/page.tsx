@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Users, Clock, Award } from "lucide-react";
 
-export function Courses() {
+export default function Courses() {
   const courses = [
     {
       id: 1,
