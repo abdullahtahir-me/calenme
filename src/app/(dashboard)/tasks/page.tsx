@@ -62,12 +62,21 @@ export default function Tasks() {
     fetchTasks();
   }, []);
 
-  const toggleTask = (id: number) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
-    );
+  const toggleTask = async (id: number, completed: boolean) => {
+    const response = await fetch(`/api/tasks/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ toggledState: !completed }),
+    });
+    if (response.ok) {
+      setTasks(
+        tasks.map((task) =>
+          task.id === id ? { ...task, completed: !task.completed } : task
+        )
+      );
+    }
   };
 
   const [title, setTitle] = useState("");
@@ -222,7 +231,7 @@ export default function Tasks() {
             <div className="flex items-start gap-3">
               <Checkbox
                 checked={task.completed}
-                onCheckedChange={() => toggleTask(task.id)}
+                onCheckedChange={() => toggleTask(task.id, task.completed)}
                 className="mt-1"
               />
               <div className="flex-1">

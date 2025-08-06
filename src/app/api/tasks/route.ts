@@ -4,8 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-
-    const supabase = await createClient();
+  const supabase = await createClient();
   const { data, error: authError } = await supabase.auth.getUser();
 
   if (authError || !data?.user) {
@@ -16,8 +15,7 @@ export async function GET(request: NextRequest) {
     .from("tasks")
     .select("*")
     .eq("user_id", data.user.id)
-    .order("created_at",{ascending: false});
-
+    .order("created_at", { ascending: false });
 
   if (selectError) {
     console.error("Supabase select error:", selectError);
@@ -27,8 +25,6 @@ export async function GET(request: NextRequest) {
     );
   }
   return NextResponse.json(tasks, { status: 200 });
-
-
 }
 
 export async function POST(request: NextRequest) {
@@ -47,7 +43,6 @@ export async function POST(request: NextRequest) {
 
   // --- FIX #3 (Database Type): Ensure this matches your DB schema ---
   // This logic is for a `priority` column of type `integer`.
-
 
   // --- FIX #4: You MUST 'await' the database query ---
   const { data: newTask, error: insertError } = await supabase
@@ -73,3 +68,5 @@ export async function POST(request: NextRequest) {
   console.log("Newly created task:", newTask);
   return NextResponse.json(newTask, { status: 201 });
 }
+
+
