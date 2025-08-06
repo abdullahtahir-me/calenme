@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import {
 import { Plus, Filter } from "lucide-react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -24,69 +25,42 @@ import { Label } from "@/components/ui/label";
 type Priority = "low" | "medium" | "high";
 
 interface Task {
+  created_at: string | number | Date;
   id: number;
   title: string;
   description: string;
   course: string;
   priority: Priority;
   completed: boolean;
-  dueDate: string;
+  due_date: string;
 }
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: 1,
-      title: "Complete Math Assignment",
-      description: "Solve problems 1-20 from chapter 4",
-      course: "Calculus I",
-      priority: "high",
-      completed: false,
-      dueDate: "2024-10-15",
-    },
-    {
-      id: 2,
-      title: "Read Biology Chapter",
-      description: "Read and summarize chapter 5",
-      course: "Biology",
-      priority: "medium",
-      completed: false,
-      dueDate: "2024-10-16",
-    },
-    {
-      id: 3,
-      title: "Chemistry Lab Report",
-      description: "Write report on last week's experiment",
-      course: "Chemistry",
-      priority: "high",
-      completed: true,
-      dueDate: "2024-10-14",
-    },
-    {
-      id: 4,
-      title: "History Essay Outline",
-      description: "Create outline for midterm essay",
-      course: "History",
-      priority: "low",
-      completed: false,
-      dueDate: "2024-10-20",
-    },
-  ]);
-
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState("all");
-  const [newTask, setNewTask] = useState<{
-    title: string;
-    description: string;
-    course: string;
-    priority: Priority;
-    dueDate: string;
-  }>({
-    title: "",
-    description: "",
-    course: "",
-    priority: "medium",
-    dueDate: "",
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const fetchTasks = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/tasks");
+      if (!response.ok) {
+        throw new Error("Error fetching the results");
+      }
+      const data = await response.json();
+      setTasks(data);
+      setLoading(false);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occured");
+      }
+    }
+  };
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   const toggleTask = (id: number) => {
     setTasks(
@@ -96,23 +70,42 @@ export default function Tasks() {
     );
   };
 
-  const addTask = () => {
-    if (newTask.title.trim()) {
-      setTasks([
-        ...tasks,
-        {
-          id: Date.now(),
-          ...newTask,
-          completed: false,
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState<Priority>("medium");
+  const [dueDate, setDueDate] = useState<string | null>(null);
+
+  const addTask = async () => {
+    if (title.trim()) {
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ]);
-      setNewTask({
-        title: "",
-        description: "",
-        course: "",
-        priority: "medium",
-        dueDate: "",
+        body: JSON.stringify({
+          title,
+          description,
+          priority,
+          dueDate,
+        }),
       });
+      if (!response.ok) {
+        // Handle errors from the server
+        const errorData = await response.json();
+        console.error("Failed to add task:", errorData.error);
+        alert(`Error: ${errorData.error}`);
+      } else {
+        // Success!
+        const createdTask = await response.json();
+        console.log("Task added successfully:", createdTask);
+        // alert("Task added!");
+        setTitle("");
+        setDescription("");
+        setPriority("medium");
+        setDueDate(null);
+        buttonRef.current?.click();
+        fetchTasks();
+      }
     }
   };
 
@@ -121,6 +114,8 @@ export default function Tasks() {
     if (filter === "pending") return !task.completed;
     return true;
   });
+  // console.log(tasks);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <div className="p-6 space-y-6">
@@ -148,13 +143,8 @@ export default function Tasks() {
                 <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"
-                  value={newTask.title}
-                  onChange={(e) =>
-                    setNewTask({
-                      ...newTask,
-                      title: e.target.value,
-                    })
-                  }
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter task title"
                 />
               </div>
@@ -162,37 +152,18 @@ export default function Tasks() {
                 <Label htmlFor="description">Description</Label>
                 <Input
                   id="description"
-                  value={newTask.description}
-                  onChange={(e) =>
-                    setNewTask({
-                      ...newTask,
-                      description: e.target.value,
-                    })
-                  }
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter task description"
-                />
-              </div>
-              <div>
-                <Label htmlFor="course">Course</Label>
-                <Input
-                  id="course"
-                  value={newTask.course}
-                  onChange={(e) =>
-                    setNewTask({
-                      ...newTask,
-                      course: e.target.value,
-                    })
-                  }
-                  placeholder="Enter course name"
                 />
               </div>
               <div>
                 <Label htmlFor="priority">Priority</Label>
                 <Select
-                  value={newTask.priority}
-                  onValueChange={(value: "low" | "medium" | "high") =>
-                    setNewTask({ ...newTask, priority: value as Priority })
-                  }
+                  value={priority}
+                  onValueChange={(value: string) => {
+                    setPriority(value as Priority);
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -209,18 +180,18 @@ export default function Tasks() {
                 <Input
                   id="dueDate"
                   type="date"
-                  value={newTask.dueDate}
-                  onChange={(e) =>
-                    setNewTask({
-                      ...newTask,
-                      dueDate: e.target.value,
-                    })
-                  }
+                  value={dueDate ? dueDate : ""}
+                  onChange={(e) => setDueDate(e.target.value)}
                 />
               </div>
               <Button onClick={addTask} className="w-full">
                 Add Task
               </Button>
+              <DialogClose asChild>
+                <Button ref={buttonRef} type="button" variant="default" hidden>
+                  Close
+                </Button>
+              </DialogClose>
             </div>
           </DialogContent>
         </Dialog>
@@ -267,9 +238,6 @@ export default function Tasks() {
                     <p className="text-sm text-muted-foreground mt-1">
                       {task.description}
                     </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {task.course}
-                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge
@@ -284,7 +252,13 @@ export default function Tasks() {
                       {task.priority}
                     </Badge>
                     <span className="text-sm text-muted-foreground">
-                      Due: {new Date(task.dueDate).toLocaleDateString()}
+                      {task.due_date &&
+                        "Due:" +
+                          new Date(task.due_date).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
                     </span>
                   </div>
                 </div>
