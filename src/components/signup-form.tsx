@@ -1,19 +1,68 @@
+"use client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useState } from "react";
+import { redirect } from "next/navigation";
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    setIsLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+    try {
+      // 3. Make the API call to your backend route
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // 4. Send the user's data in the request body
+        body: JSON.stringify({ email, password }), // Note: fullName will be in user_metadata
+      });
+
+      // 5. Parse the JSON response from the server
+      const data = await response.json();
+
+      // 6. Check if the request was successful
+      if (!response.ok) {
+        // If the server returned an error, display it
+        setError(data.error || "Something went wrong.");
+      } else {
+        // If signup was successful, show the success message from the API
+        setSuccessMessage(data.message);
+        // Optional: Clear the form fields
+        setEmail("");
+        setPassword("");
+        redirect("/dashboard")
+      }
+    } catch (err) {
+      // 7. Handle network errors or other unexpected issues
+      setError("A network error occurred. Please try again.");
+      console.error("Signup fetch error:", err);
+    } finally {
+      // 8. Reset the loading state regardless of outcome
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome</h1>
@@ -27,6 +76,8 @@ export function SignupForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
@@ -34,11 +85,22 @@ export function SignupForm({
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="UPPPERCASE, lowercase and numbers required"
+                  required
+                />
               </div>
               <Button type="submit" className="w-full">
                 SignUp
               </Button>
+              {error && <p style={{ color: "red" }}>Error: {error}</p>}
+              {successMessage && (
+                <p style={{ color: "green" }}>{successMessage}</p>
+              )}
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                 <span className="bg-card text-muted-foreground relative z-10 px-2">
                   Or continue with
@@ -80,4 +142,7 @@ export function SignupForm({
       </div>
     </div>
   );
+}
+function async(FormEvent: any) {
+  throw new Error("Function not implemented.");
 }
