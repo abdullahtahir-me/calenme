@@ -1,3 +1,4 @@
+"use client";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -16,7 +17,73 @@ import {
   TrendingUp,
   User,
 } from "lucide-react";
+// This is your dummy data object. It matches the structure your frontend would create.
+const dummyCourseData = {
+  courseName: "Introduction to Quantum Computing",
+  courseCode: "PHYS451",
+  instructor: "Dr. Schrödinger",
+  credits: 3,
+  color: "#8A2BE2", // A nice purple
+  description: "Exploring the principles of quantum mechanics and their application to computation.",
+  sessions: [
+    {
+      day: "Tuesday",
+      startTime: "11:00:00",
+      endTime: "12:30:00",
+      type: "lecture",
+      venue: "Quantum Hall, Room 101"
+    },
+    {
+      day: "Thursday",
+      startTime: "11:00:00",
+      endTime: "12:30:00",
+      type: "lecture",
+      venue: "Quantum Hall, Room 101"
+    },
+    {
+      day: "Friday",
+      startTime: "14:00:00",
+      endTime: "16:00:00",
+      type: "lab",
+      venue: "Simulation Lab B"
+    }
+  ]
+};
+// This async function performs the API call.
+async function testCreateCourse() {
+  console.log("Sending the following data to the API:", dummyCourseData);
 
+  try {
+    const response = await fetch('/api/courses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // We convert our JavaScript object into a JSON string for transport.
+      body: JSON.stringify(dummyCourseData),
+    });
+
+    // Get the response body as JSON
+    const result = await response.json();
+
+    // Check if the HTTP response status is OK (e.g., 200, 201)
+    if (!response.ok) {
+      // If the server returned an error, log it to the console
+      console.error(`API Error: ${response.status} ${response.statusText}`);
+      console.error("Server's error message:", result);
+      alert("Failed to create course. Check the console for details.");
+    } else {
+      // If the request was successful, log the new course data returned by the server
+      console.log("✅ Success! Server responded with:", result);
+      alert("Course created successfully! Check your database and the console.");
+    }
+
+  } catch (error) {
+    // This catches network errors (e.g., server is down, no internet)
+    console.error("A network or fetch error occurred:", error);
+    alert("A network error occurred. Could not reach the server.");
+  }
+}
 export default function Dashboard() {
   const stats = [
     {
@@ -145,6 +212,7 @@ export default function Dashboard() {
     }
     return "now";
   };
+  
   // Get current time and day for realistic upcoming classes
   const getCurrentDay = () => {
     const days = [
@@ -168,6 +236,13 @@ export default function Dashboard() {
           <p className="text-muted-foreground text-sm">
             Welcome back! Here's your academic overview.
           </p>
+          <h2>Testing Area</h2>
+      <button 
+        onClick={testCreateCourse} 
+        style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
+      >
+        Test Create Course API
+      </button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat) => {
