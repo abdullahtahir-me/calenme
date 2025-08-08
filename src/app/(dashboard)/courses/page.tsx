@@ -67,7 +67,7 @@ export default function Courses() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  
+
   const fetchCourses = async () => {
     setLoading(true);
     try {
@@ -546,23 +546,23 @@ export default function Courses() {
                   </div>
 
                   {/* Next Class Info */}
-                  {course.nextClass && (
+                  {course.sessions && (
                     <div className="p-3 bg-muted rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Clock className="h-4 w-4 text-primary" />
                         <span className="font-medium text-sm">Next Class</span>
                         <Badge variant="outline" className="text-xs">
-                          {course.nextClass.type}
+                          {course.sessions.at(0)?.type}
                         </Badge>
                       </div>
                       <div className="space-y-1 text-sm">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3 text-muted-foreground" />
-                          <span>{getNextClassTime(course)}</span>
+                          <span>{`On ${course.sessions.at(0)?.day} at ${course.sessions.at(0)?.startTime.substring(0,5)}`}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <MapPin className="h-3 w-3 text-muted-foreground" />
-                          <span>{course.nextClass.venue}</span>
+                          <span>{course.sessions.at(0)?.venue}</span>
                         </div>
                       </div>
                     </div>
