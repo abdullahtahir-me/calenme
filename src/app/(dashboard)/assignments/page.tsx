@@ -1,96 +1,112 @@
+"use client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, FileText, Clock } from "lucide-react";
+import { Calendar, FileText, Clock, Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useEffect, useState } from "react";
+
+type assignmentType = "Exam" | "Project" | "Assignment";
+type Assignment = {
+  id: string;
+  course: string;
+  title: string;
+  type: assignmentType;
+  description: string;
+  dueDate: Date;
+  completed: boolean;
+};
+type newAssignment = {
+  course: string;
+  title: string;
+  type: assignmentType;
+  description: string;
+  dueDate: Date | null;
+  completed: boolean;
+};
+type Course = {
+  id: number;
+  title: string;
+  code: string;
+};
 
 export default function Assignments() {
-  const assignments = [
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [newAssignment, setNewAssignment] = useState<newAssignment>({
+    title: "",
+    course: "",
+    type: "Assignment",
+    dueDate: null,
+    completed: false,
+    description: "",
+  });
+  const [courses, setCourses] = useState<Course[]>([]);
+
+  const assignmentsdata: Assignment[] = [
     {
-      id: 1,
+      id: "1",
       title: "Calculus Midterm Exam",
       course: "Calculus I",
       type: "Exam",
-      dueDate: "2024-10-20",
-      status: "in-progress",
+      dueDate: new Date("2024-10-20"),
+      completed: true,
       description: "Comprehensive exam covering chapters 1-6",
-      weight: "25%",
     },
     {
-      id: 2,
+      id: "2",
       title: "History Research Paper",
       course: "American History",
-      type: "Paper",
-      dueDate: "2024-10-25",
-      status: "in-progress",
+      type: "Exam",
+      dueDate: new Date("2024-10-25"),
+      completed: false,
       description: "15-page research paper on the Industrial Revolution",
-      weight: "30%",
-    },
-    {
-      id: 3,
-      title: "Computer Science Project",
-      course: "Intro to Programming",
-      type: "Project",
-      dueDate: "2024-11-01",
-      status: "in-progress",
-      description: "Build a web application using React",
-      weight: "40%",
-    },
-    {
-      id: 4,
-      title: "Biology Lab Final",
-      course: "Biology 101",
-      type: "Lab",
-      dueDate: "2024-10-18",
-      status: "completed",
-      description: "Complete analysis of microscopy samples",
-      weight: "15%",
-    },
-    {
-      id: 5,
-      title: "Chemistry Problem Set",
-      course: "General Chemistry",
-      type: "Homework",
-      dueDate: "2024-10-22",
-      status: "not-started",
-      description: "Solve problems 1-50 from chapter 8",
-      weight: "10%",
     },
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-500";
-      case "in-progress":
-        return "bg-blue-500";
-      case "not-started":
-        return "bg-gray-400";
-      default:
-        return "bg-gray-400";
-    }
-  };
+  useEffect(() => {
+    setAssignments(assignmentsdata);
+    getCourse();
+  }, []);
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "Completed";
-      case "in-progress":
-        return "In Progress";
-      case "not-started":
-        return "Not Started";
-      default:
-        return "Unknown";
-    }
+  const getStatusColor = (status: boolean) => {
+    if (status) return "bg-green-500";
+    return "bg-gray-400";
   };
-
-  const getDaysUntilDue = (dueDate: string) => {
+  const getStatusText = (status: boolean) => {
+    if (status) return "Completed";
+    return "Pending";
+  };
+  const getDaysUntilDue = (dueDate: Date) => {
     const today = new Date();
-    const due = new Date(dueDate);
+    const due = dueDate;
     const diffTime = due.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
+  const getCourse = async () => {
+    const response = await fetch("/api/courses?query=coursesName");
+    if (!response.ok) console.log("error loading the courses details");
+    const data = await response.json();
+    console.log(data);
+    setCourses(data);
+  };
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -99,6 +115,121 @@ export default function Assignments() {
           Track your major assignments and their progress.
         </p>
       </div>
+
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogTrigger asChild>
+          <Button className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add assignment
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Assignsment</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name">Title</Label>
+                <Input
+                  id="title"
+                  value={newAssignment.title}
+                  onChange={(e) =>
+                    setNewAssignment({
+                      ...newAssignment,
+                      title: e.target.value,
+                    })
+                  }
+                  placeholder="Title"
+                />
+              </div>
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Input
+                  id="description"
+                  value={newAssignment.description}
+                  onChange={(e) =>
+                    setNewAssignment({
+                      ...newAssignment,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder="Description"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="type">Type</Label>
+              <Select
+                value={newAssignment.type}
+                onValueChange={(value) =>
+                  setNewAssignment({
+                    ...newAssignment,
+                    type: value as assignmentType,
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Exam">Exam</SelectItem>
+                  <SelectItem value="Project">Project</SelectItem>
+                  <SelectItem value="Assignment">Assignment</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="course">Course</Label>
+              <Select
+                value={newAssignment.course}
+                onValueChange={(value) =>
+                  setNewAssignment({ ...newAssignment, course: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {courses.map((course) => {
+                    return (
+                      <SelectItem key={course.id} value={course.title}>
+                        {course.title}
+                      </SelectItem>
+                    );
+                  })}
+                  <SelectItem value="Course 2">c2</SelectItem>
+                  <SelectItem value="Course 3">c3</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="dueDate">Due Date</Label>
+              <Input
+                id="dueDate"
+                type="date"
+                onChange={(e) =>
+                  setNewAssignment({
+                    ...newAssignment,
+                    dueDate: new Date(e.target.value),
+                  })
+                }
+                placeholder="DueDate"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+              Cancel
+            </Button>
+            <Button>Add Assignment</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -122,7 +253,7 @@ export default function Assignments() {
             <div>
               <p className="text-sm text-muted-foreground">In Progress</p>
               <p className="font-semibold">
-                {assignments.filter((a) => a.status === "in-progress").length}
+                {assignments.filter((a) => !a.completed).length}
               </p>
             </div>
           </div>
@@ -136,7 +267,7 @@ export default function Assignments() {
             <div>
               <p className="text-sm text-muted-foreground">Completed</p>
               <p className="font-semibold">
-                {assignments.filter((a) => a.status === "completed").length}
+                {assignments.filter((a) => a.completed).length}
               </p>
             </div>
           </div>
@@ -167,16 +298,13 @@ export default function Assignments() {
                     <div className="flex items-center gap-2">
                       <div
                         className={`w-2 h-2 rounded-full ${getStatusColor(
-                          assignment.status
+                          assignment.completed
                         )}`}
                       />
                       <span className="text-sm">
-                        {getStatusText(assignment.status)}
+                        {getStatusText(assignment.completed)}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      Weight: {assignment.weight}
-                    </p>
                     <p className="text-sm text-muted-foreground">
                       Due: {new Date(assignment.dueDate).toLocaleDateString()}
                     </p>

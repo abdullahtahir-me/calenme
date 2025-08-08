@@ -1,30 +1,46 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 type ClassSession = {
-    day: string;
-    startTime: string;
-    endTime: string;
-    type: "lecture" | "lab";
-    venue: string;
+  day: string;
+  startTime: string;
+  endTime: string;
+  type: "lecture" | "lab";
+  venue: string;
 };
 
-
-
-
 export async function GET(request: NextRequest) {
+  const seachParams = request.nextUrl.searchParams;
+  const query = seachParams.get("query");
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+  if (authError || !user) {
+    console.log(authError);
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
-    const supabase =  await createClient();
-    const { data: {user}, error:  authError } = await supabase.auth.getUser();
-    if (authError || !user){
-        console.log(authError);
-        return NextResponse.json({message: "Unauthorized"}, {status: 401});
+  if(query==="coursesName"){
+    const { data: courses, error } = await supabase.from('courses').select('id,title,code').eq('user_id', user.id);
+    if(error){
+      console.log(error);
+      return NextResponse.json(error, {status: 400});
     }
-     const { data: courses, error: rpcError } = await supabase
-    .rpc('get_courses_with_details');
+    return NextResponse.json(courses, {status: 200});
+  }
+
+
+  const { data: courses, error: rpcError } = await supabase.rpc(
+    "get_courses_with_details"
+  );
 
   if (rpcError) {
     console.error("Supabase RPC select error:", rpcError);
-    return NextResponse.json({ error: "Failed to retrieve course details." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to retrieve course details." },
+      { status: 500 }
+    );
   }
 
   // The function returns a single JSON object (the array). If no courses are found,
@@ -32,23 +48,45 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(courses || [], { status: 200 });
 }
 
-
-
-
-
 export async function POST(request: NextRequest) {
-  const { courseName, courseCode, instructor, credits, description, color, sessions } = await request.json();
-  console.log("Courses from the outgoing route in backend"+courseName,courseCode,instructor,credits,description,color,sessions,);
+  const {
+    courseName,
+    courseCode,
+    instructor,
+    credits,
+    description,
+    color,
+    sessions,
+  } = await request.json();
+  console.log(
+    "Courses from the outgoing route in backend" + courseName,
+    courseCode,
+    instructor,
+    credits,
+    description,
+    color,
+    sessions
+  );
   const supabase = await createClient();
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
   if (authError || !user) {
     return NextResponse.json({ message: "unauthorized" }, { status: 401 });
   }
 
-  if (!courseName || typeof courseName != "string" || courseName.trim().length <= 0 ) {
-    console.log("course naem cannot be empty")
-    return NextResponse.json({ message: "course name can't be empty" }, { status: 400 });
+  if (
+    !courseName ||
+    typeof courseName != "string" ||
+    courseName.trim().length <= 0
+  ) {
+    console.log("course naem cannot be empty");
+    return NextResponse.json(
+      { message: "course name can't be empty" },
+      { status: 400 }
+    );
   }
 
   const scheduleItemsForDB = (sessions || []).map((session: ClassSession) => ({
@@ -73,9 +111,11 @@ export async function POST(request: NextRequest) {
   );
 
   if (rpcError) {
-    console.error("Supabase RPC Error:", rpcError); 
-    return NextResponse.json({ message: "Course can't be added" }, { status: 400 });
+    console.error("Supabase RPC Error:", rpcError);
+    return NextResponse.json(
+      { message: "Course can't be added" },
+      { status: 400 }
+    );
   }
   return NextResponse.json(courseData, { status: 201 });
 }
-
