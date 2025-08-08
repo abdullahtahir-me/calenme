@@ -1,13 +1,40 @@
 import { createClient } from "@/utils/supabase/server";
-import { LogIn } from "lucide-react";
 import { NextRequest, NextResponse } from "next/server";
 type ClassSession = {
-  day: string;
-  startTime: string;
-  endTime: string;
-  type: "lecture" | "lab";
-  venue: string;
+    day: string;
+    startTime: string;
+    endTime: string;
+    type: "lecture" | "lab";
+    venue: string;
 };
+
+
+
+
+export async function GET(request: NextRequest) {
+
+    const supabase =  await createClient();
+    const { data: {user}, error:  authError } = await supabase.auth.getUser();
+    if (authError || !user){
+        console.log(authError);
+        return NextResponse.json({message: "Unauthorized"}, {status: 401});
+    }
+     const { data: courses, error: rpcError } = await supabase
+    .rpc('get_courses_with_details');
+
+  if (rpcError) {
+    console.error("Supabase RPC select error:", rpcError);
+    return NextResponse.json({ error: "Failed to retrieve course details." }, { status: 500 });
+  }
+
+  // The function returns a single JSON object (the array). If no courses are found,
+  // it might return null, so we default to an empty array.
+  return NextResponse.json(courses || [], { status: 200 });
+}
+
+
+
+
 
 export async function POST(request: NextRequest) {
   const { courseName, courseCode, instructor, credits, description, color, sessions } = await request.json();
@@ -52,20 +79,3 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(courseData, { status: 201 });
 }
 
-export async function GET(request: NextRequest) {
-
-    const supabase =  await createClient();
-    const { data: {user}, error:  authError } = await supabase.auth.getUser();
-    if (authError || !user){
-        console.log(authError);
-        return NextResponse.json({message: "Unauthorized"}, {status: 401});
-    }
-    const { data: courseData, error } = await supabase.from('courses').select('*').eq('user_id',user.id).order('credits',{ascending:false});
-    if(error){
-        console.log(error);
-        return NextResponse.json(error, {status: 400});
-    }
-    console.log(courseData);
-    return NextResponse.json(courseData, {status: 200});
-    
-}
