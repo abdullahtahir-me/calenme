@@ -66,8 +66,6 @@ export default function Courses() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-
   const fetchCourses = async () => {
     setLoading(true);
     try {
