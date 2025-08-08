@@ -66,6 +66,8 @@ export default function Courses() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  
   const fetchCourses = async () => {
     setLoading(true);
     try {
@@ -87,6 +89,8 @@ export default function Courses() {
       }
     }
   };
+
+
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -100,7 +104,7 @@ export default function Courses() {
     credits: 3,
     description: "",
     color: "bg-blue-500",
-    sessions: [],
+    sessions: [] as ClassSession[],
   });
   const [enableSchedule, setEnableSchedule] = useState(false);
   const [sessions, setSessions] = useState<ClassSession[]>([]);
@@ -109,16 +113,7 @@ export default function Courses() {
 
   const totalCredits = courses.reduce((sum, course) => sum + course.credits, 0);
 
-  const colors = [
-    "bg-blue-500",
-    "bg-green-500",
-    "bg-purple-500",
-    "bg-red-500",
-    "bg-orange-500",
-    "bg-teal-500",
-    "bg-pink-500",
-    "bg-indigo-500",
-  ];
+  const colors = ["bg-blue-500", "bg-green-500", "bg-purple-500", "bg-red-500", "bg-orange-500", "bg-teal-500", "bg-pink-500", "bg-indigo-500"];
 
   const addSession = () => {
     setSessions([
@@ -149,9 +144,9 @@ export default function Courses() {
 
   const handleAddCourse = async () => {
     setShowAddDialog(false);
-
+    newCourse.sessions = sessions
     console.log("Sending the following data to the API:", newCourse);
-
+    console.log(sessions)
     try {
       const response = await fetch("/api/courses", {
         method: "POST",
@@ -182,16 +177,6 @@ export default function Courses() {
       console.error("A network or fetch error occurred:", error);
       alert("A network error occurred. Could not reach the server.");
     }
-
-    // const course: Course = {
-    //   id: Date.now(),
-    //   ...newCourse,
-    //   assignments: 0,
-    //   sessions: enableSchedule ? sessions.map(s => ({
-    //     ...s,
-    //     venue: sameVenue ? commonVenue : s.venue
-    //   })) : []
-    // }
 
     setSessions([]);
     setNewCourse({
