@@ -1,4 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
+import { LogIn } from "lucide-react";
 import { NextRequest, NextResponse } from "next/server";
 type ClassSession = {
   day: string;
@@ -9,42 +10,18 @@ type ClassSession = {
 };
 
 export async function POST(request: NextRequest) {
-  const {
-    courseName,
-    courseCode,
-    instructor,
-    credits,
-    description,
-    color,
-    sessions,
-  } = await request.json();
-  console.log(courseName,
-    courseCode,
-    instructor,
-    credits,
-    description,
-    color,
-    sessions,);
+  const { courseName, courseCode, instructor, credits, description, color, sessions } = await request.json();
+  console.log("Courses from the outgoing route in backend"+courseName,courseCode,instructor,credits,description,color,sessions,);
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
     return NextResponse.json({ message: "unauthorized" }, { status: 401 });
   }
 
-  if (
-    !courseName ||
-    typeof courseName != "string" ||
-    courseName.trim().length <= 0
-  ) {
+  if (!courseName || typeof courseName != "string" || courseName.trim().length <= 0 ) {
     console.log("course naem cannot be empty")
-    return NextResponse.json(
-      { message: "course name can't be empty" },
-      { status: 400 }
-    );
+    return NextResponse.json({ message: "course name can't be empty" }, { status: 400 });
   }
 
   const scheduleItemsForDB = (sessions || []).map((session: ClassSession) => ({
@@ -69,12 +46,26 @@ export async function POST(request: NextRequest) {
   );
 
   if (rpcError) {
-    console.error("Supabase RPC Error:", rpcError); // Log the actual error
-
-    return NextResponse.json(
-      { message: "Course can't be added" },
-      { status: 400 }
-    );
+    console.error("Supabase RPC Error:", rpcError); 
+    return NextResponse.json({ message: "Course can't be added" }, { status: 400 });
   }
   return NextResponse.json(courseData, { status: 201 });
+}
+
+export async function GET(request: NextRequest) {
+
+    const supabase =  await createClient();
+    const { data: {user}, error:  authError } = await supabase.auth.getUser();
+    if (authError || !user){
+        console.log(authError);
+        return NextResponse.json({message: "Unauthorized"}, {status: 401});
+    }
+    const { data: courseData, error } = await supabase.from('courses').select('*').eq('user_id',user.id).order('credits',{ascending:false});
+    if(error){
+        console.log(error);
+        return NextResponse.json(error, {status: 400});
+    }
+    console.log(courseData);
+    return NextResponse.json(courseData, {status: 200});
+    
 }
