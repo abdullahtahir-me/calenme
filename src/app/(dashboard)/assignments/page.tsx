@@ -32,7 +32,7 @@ type Assignment = {
   completed: boolean;
 };
 type newAssignment = {
-  course: string;
+  course_id: string;
   title: string;
   type: assignmentType;
   description: string;
@@ -40,7 +40,7 @@ type newAssignment = {
   completed: boolean;
 };
 type Course = {
-  id: number;
+  id: string;
   title: string;
   code: string;
 };
@@ -49,7 +49,7 @@ export default function Assignments() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [newAssignment, setNewAssignment] = useState<newAssignment>({
     title: "",
-    course: "",
+    course_id: "",
     type: "Assignment",
     dueDate: null,
     completed: false,
@@ -79,7 +79,7 @@ export default function Assignments() {
   ];
 
   useEffect(() => {
-    setAssignments(assignmentsdata);
+    fetchAssignments();
     getCourse();
   }, []);
 
@@ -92,11 +92,30 @@ export default function Assignments() {
     return "Pending";
   };
   const getDaysUntilDue = (dueDate: Date) => {
-    const today = new Date();
-    const due = dueDate;
-    const diffTime = due.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    if (!dueDate) {
+    return null; // Or return a large number, or some other default
+  }
+
+  const today = new Date();
+  // 2. THIS IS THE FIX: Create a new Date object from the incoming string.
+  //    The `new Date()` constructor is excellent at parsing ISO date strings.
+  const due = new Date(dueDate);
+
+  // 3. Check if the date was valid. If an invalid string was passed,
+  //    `due.getTime()` will be NaN (Not a Number).
+  if (isNaN(due.getTime())) {
+    return null;
+  }
+
+  // Set both dates to the start of their respective days for an accurate day count
+  today.setHours(0, 0, 0, 0);
+  due.setHours(0, 0, 0, 0);
+  
+  const diffTime = due.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  return diffDays;
+    // 
   };
   const [showAddDialog, setShowAddDialog] = useState(false);
 
@@ -106,6 +125,44 @@ export default function Assignments() {
     const data = await response.json();
     console.log(data);
     setCourses(data);
+  };
+
+  const fetchAssignments = async () => {
+    const response = await fetch("/api/assignments");
+    if(!response.ok){
+      console.log("error fetching the courses")
+    }
+    const data = await response.json();
+    setAssignments(data);
+  }
+
+  const handleAddAssignment = async () => {
+    console.log(newAssignment);
+    setShowAddDialog(false)
+    const response = await fetch("/api/assignments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newAssignment),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      console.error(`API Error: ${response.status} ${response.statusText}`);
+      console.error("Server's error message:", result);
+      alert("Error entering the assignment");
+    }
+    fetchAssignments();
+    // alert("Successfull");
+    setNewAssignment({
+      title: "",
+      course_id: "",
+      type: "Assignment",
+      dueDate: null,
+      completed: false,
+      description: "",
+    });
+
   };
   return (
     <div className="p-6 space-y-6">
@@ -144,80 +201,78 @@ export default function Assignments() {
                 />
               </div>
               <div>
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="dueDate">Due Date</Label>
                 <Input
-                  id="description"
-                  value={newAssignment.description}
+                  id="dueDate"
+                  type="date"
                   onChange={(e) =>
                     setNewAssignment({
                       ...newAssignment,
-                      description: e.target.value,
+                      dueDate: new Date(e.target.value),
                     })
                   }
-                  placeholder="Description"
+                  placeholder="DueDate"
                 />
               </div>
             </div>
+            <div className="grid grid-cols-1 space-y-4 md:grid-cols-2 ">
+              <div>
+                <Label htmlFor="type">Type</Label>
+                <Select
+                  value={newAssignment.type}
+                  onValueChange={(value) =>
+                    setNewAssignment({
+                      ...newAssignment,
+                      type: value as assignmentType,
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Exam">Exam</SelectItem>
+                    <SelectItem value="Project">Project</SelectItem>
+                    <SelectItem value="Assignment">Assignment</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <Label htmlFor="type">Type</Label>
-              <Select
-                value={newAssignment.type}
-                onValueChange={(value) =>
-                  setNewAssignment({
-                    ...newAssignment,
-                    type: value as assignmentType,
-                  })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Exam">Exam</SelectItem>
-                  <SelectItem value="Project">Project</SelectItem>
-                  <SelectItem value="Assignment">Assignment</SelectItem>
-                </SelectContent>
-              </Select>
+              <div>
+                <Label htmlFor="course">Course</Label>
+                <Select
+                  value={newAssignment.course_id}
+                  onValueChange={(value) =>
+                    setNewAssignment({ ...newAssignment, course_id: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {courses.map((course) => {
+                      return (
+                        <SelectItem key={course.id} value={course.id}>
+                          {course.title}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-
             <div>
-              <Label htmlFor="course">Course</Label>
-              <Select
-                value={newAssignment.course}
-                onValueChange={(value) =>
-                  setNewAssignment({ ...newAssignment, course: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {courses.map((course) => {
-                    return (
-                      <SelectItem key={course.id} value={course.title}>
-                        {course.title}
-                      </SelectItem>
-                    );
-                  })}
-                  <SelectItem value="Course 2">c2</SelectItem>
-                  <SelectItem value="Course 3">c3</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="dueDate">Due Date</Label>
+              <Label htmlFor="description">Description</Label>
               <Input
-                id="dueDate"
-                type="date"
+                id="description"
+                value={newAssignment.description}
                 onChange={(e) =>
                   setNewAssignment({
                     ...newAssignment,
-                    dueDate: new Date(e.target.value),
+                    description: e.target.value,
                   })
                 }
-                placeholder="DueDate"
+                placeholder="Description"
               />
             </div>
           </div>
@@ -226,7 +281,7 @@ export default function Assignments() {
             <Button variant="outline" onClick={() => setShowAddDialog(false)}>
               Cancel
             </Button>
-            <Button>Add Assignment</Button>
+            <Button onClick={handleAddAssignment}>Add Assignment</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -308,7 +363,7 @@ export default function Assignments() {
                     <p className="text-sm text-muted-foreground">
                       Due: {new Date(assignment.dueDate).toLocaleDateString()}
                     </p>
-                    {daysUntilDue >= 0 && (
+                    {(daysUntilDue!== null && daysUntilDue >= 0) && (
                       <p
                         className={`text-sm ${
                           daysUntilDue <= 3

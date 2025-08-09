@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       user_id: data.user.id,
       title: title,
       description: description,
-      priority: priority, // Make sure your DB column type is integer
+      priority: priority,
       due_date: dueDate,
     })
     .select() // Use .select() to get the new row back
