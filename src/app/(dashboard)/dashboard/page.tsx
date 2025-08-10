@@ -14,21 +14,14 @@ import {
   CheckSquare,
   Clock,
   MapPin,
-  TrendingUp,
   User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import AssignmentWidget from "./_widgets/assigment";
+import TasksWidget from "./_widgets/tasks";
 
-type AssignmentType = "Exam" | "Assignment" | "Project"
 type Priority = "low" | "medium" | "high";
 
-type UpcomingAssignments = {
-  id: string,
-  title: string,
-  dueDate: string,
-  type: AssignmentType,
-  course: string,
-}
 
 type Task = {
   id: number;
@@ -41,14 +34,12 @@ type Task = {
 export default function Dashboard() {
   useEffect(() => {
     fetchData();
-    setUpcomingAssignments(upcomingAssignmentsData)
   }, [])
 
 
   const [activeCourses, setActiveCourses] = useState("");
   const [pendingAssignments, setPendingAssignments] = useState("")
   const [pendingTasks, setPendingTasks] = useState("");
-  const [upcomingAssignments, setUpcomingAssignments] = useState<UpcomingAssignments[]>([])
 
   const fetchData = async () => {
     const response = await fetch("/api/dashboard");
@@ -158,11 +149,7 @@ export default function Dashboard() {
       priority: "low",
     },
   ];
-  const upcomingAssignmentsData = [
-    { id: "1", title: "Midterm Exam", course: "Calculus I", dueDate: "Oct 20" , type: "Exam" as AssignmentType},
-    { id: "2", title: "Research Paper", course: "History", dueDate: "Oct 25" , type: "Exam" as AssignmentType},
-    { id: "3", title: "Group Project", course: "Computer Science", dueDate: "Nov 1", type: "Exam" as AssignmentType},
-  ];
+  
 
   const formatTimeUntil = (time: string) => {
     // This would calculate actual time until class in a real app
@@ -290,60 +277,13 @@ export default function Dashboard() {
           {/* Recent Tasks */}
           <Card className="p-6">
             <h3 className="mb-4">Recent Tasks</h3>
-            <div className="space-y-3">
-              {recentTasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="flex items-center justify-between p-3 border border-border rounded-lg"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium">{task.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {task.course}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant={
-                        task.priority === "high"
-                          ? "destructive"
-                          : task.priority === "medium"
-                            ? "default"
-                            : "secondary"
-                      }
-                    >
-                      {task.priority}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {task.due}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TasksWidget />
           </Card>
 
           {/* Upcoming Assignments */}
           <Card className="p-6">
             <h3 className="mb-4">Upcoming Assignments</h3>
-            <div className="space-y-3">
-              {upcomingAssignments.map((assignment) => (
-                <div
-                  key={assignment.id}
-                  className="flex items-center justify-between p-3 border border-border rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium">{assignment.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {assignment.course}
-                    </p>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    Due {assignment.dueDate}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <AssignmentWidget />
           </Card>
         </div>
       </div>
