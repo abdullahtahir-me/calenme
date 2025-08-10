@@ -19,6 +19,7 @@ import {
 import { useEffect, useState } from "react";
 import AssignmentWidget from "./_widgets/assigment";
 import TasksWidget from "./_widgets/tasks";
+import ScheduleWidget from "./_widgets/schedule";
 
 type Priority = "low" | "medium" | "high";
 
@@ -217,62 +218,7 @@ export default function Dashboard() {
               <Clock className="h-4 w-4" />
               Upcoming Classes
             </h3>
-            <div className="space-y-4">
-              {upcomingClasses.slice(0, 4).map((classItem) => (
-                <div key={classItem.id} className="relative">
-                  <div className="flex items-start gap-3 p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors">
-                    <div
-                      className={`w-3 h-3 rounded-full ${classItem.color} mt-2 flex-shrink-0`}
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-medium truncate">
-                          {classItem.name}
-                        </h4>
-                        <Badge
-                          variant={
-                            classItem.status === "next"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {classItem.status === "next"
-                            ? "Next"
-                            : classItem.status === "today"
-                              ? "Today"
-                              : "Tomorrow"}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {classItem.code}
-                      </p>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3" />
-                          <span>
-                            {classItem.time} - {classItem.endTime}
-                          </span>
-                          {classItem.status === "next" && (
-                            <span className="text-primary">
-                              ({formatTimeUntil(classItem.time)})
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="h-3 w-3" />
-                          <span>{classItem.location}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <User className="h-3 w-3" />
-                          <span>{classItem.instructor}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ScheduleWidget />
           </Card>
           {/* Recent Tasks */}
           <Card className="p-6">
