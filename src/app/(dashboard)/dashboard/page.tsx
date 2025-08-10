@@ -17,98 +17,69 @@ import {
   TrendingUp,
   User,
 } from "lucide-react";
-// This is your dummy data object. It matches the structure your frontend would create.
-const dummyCourseData = {
-  courseName: "Introduction to Quantum Computing",
-  courseCode: "PHYS451",
-  instructor: "Dr. Schrödinger",
-  credits: 3,
-  color: "#8A2BE2", // A nice purple
-  description: "Exploring the principles of quantum mechanics and their application to computation.",
-  sessions: [
-    {
-      day: "Tuesday",
-      startTime: "11:00:00",
-      endTime: "12:30:00",
-      type: "lecture",
-      venue: "Quantum Hall, Room 101"
-    },
-    {
-      day: "Thursday",
-      startTime: "11:00:00",
-      endTime: "12:30:00",
-      type: "lecture",
-      venue: "Quantum Hall, Room 101"
-    },
-    {
-      day: "Friday",
-      startTime: "14:00:00",
-      endTime: "16:00:00",
-      type: "lab",
-      venue: "Simulation Lab B"
-    }
-  ]
-};
-// This async function performs the API call.
-async function testCreateCourse() {
-  console.log("Sending the following data to the API:", dummyCourseData);
+import { useEffect, useState } from "react";
 
-  try {
-    const response = await fetch('/api/courses', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // We convert our JavaScript object into a JSON string for transport.
-      body: JSON.stringify(dummyCourseData),
-    });
+type AssignmentType = "Exam" | "Assignment" | "Project"
+type Priority = "low" | "medium" | "high";
 
-    // Get the response body as JSON
-    const result = await response.json();
-
-    // Check if the HTTP response status is OK (e.g., 200, 201)
-    if (!response.ok) {
-      // If the server returned an error, log it to the console
-      console.error(`API Error: ${response.status} ${response.statusText}`);
-      console.error("Server's error message:", result);
-      alert("Failed to create course. Check the console for details.");
-    } else {
-      // If the request was successful, log the new course data returned by the server
-      console.log("✅ Success! Server responded with:", result);
-      alert("Course created successfully! Check your database and the console.");
-    }
-
-  } catch (error) {
-    // This catches network errors (e.g., server is down, no internet)
-    console.error("A network or fetch error occurred:", error);
-    alert("A network error occurred. Could not reach the server.");
-  }
+type UpcomingAssignments = {
+  id: string,
+  title: string,
+  dueDate: string,
+  type: AssignmentType,
+  course: string,
 }
+
+type Task = {
+  id: number;
+  title: string;
+  course: string;
+  priority: Priority;
+  due_date: string;
+}
+
 export default function Dashboard() {
+  useEffect(() => {
+    fetchData();
+    setUpcomingAssignments(upcomingAssignmentsData)
+  }, [])
+
+
+  const [activeCourses, setActiveCourses] = useState("");
+  const [pendingAssignments, setPendingAssignments] = useState("")
+  const [pendingTasks, setPendingTasks] = useState("");
+  const [upcomingAssignments, setUpcomingAssignments] = useState<UpcomingAssignments[]>([])
+
+  const fetchData = async () => {
+    const response = await fetch("/api/dashboard");
+    if (!response.ok) {
+      alert("Can't fetch the stats")
+    }
+    const data = await response.json();
+    setActiveCourses(data.courses);
+    setPendingAssignments(data.assignments);
+    setPendingTasks(data.tasks);
+  }
+
+
   const stats = [
     {
       title: "Active Courses",
-      value: "6",
+      value: activeCourses,
       icon: BookOpen,
       color: "text-chart-1",
     },
     {
       title: "Pending Tasks",
-      value: "12",
+      value: pendingTasks,
       icon: CheckSquare,
       color: "text-chart-2",
     },
     {
-      title: "Hours Studied",
-      value: "28.5",
+      title: "Pending Assignments",
+      value: pendingAssignments,
       icon: Clock,
       color: "text-chart-3",
-    },
-    {
-      title: "Average Grade",
-      value: "87%",
-      icon: TrendingUp,
-      color: "text-chart-4",
     },
   ];
   const upcomingClasses = [
@@ -187,10 +158,10 @@ export default function Dashboard() {
       priority: "low",
     },
   ];
-  const upcomingAssignments = [
-    { id: 1, title: "Midterm Exam", course: "Calculus I", due: "Oct 20" },
-    { id: 2, title: "Research Paper", course: "History", due: "Oct 25" },
-    { id: 3, title: "Group Project", course: "Computer Science", due: "Nov 1" },
+  const upcomingAssignmentsData = [
+    { id: "1", title: "Midterm Exam", course: "Calculus I", dueDate: "Oct 20" , type: "Exam" as AssignmentType},
+    { id: "2", title: "Research Paper", course: "History", dueDate: "Oct 25" , type: "Exam" as AssignmentType},
+    { id: "3", title: "Group Project", course: "Computer Science", dueDate: "Nov 1", type: "Exam" as AssignmentType},
   ];
 
   const formatTimeUntil = (time: string) => {
@@ -203,8 +174,8 @@ export default function Dashboard() {
         ? 0
         : hour
       : hour === 12
-      ? 12
-      : hour + 12;
+        ? 12
+        : hour + 12;
 
     if (targetHour > current.getHours()) {
       const hoursUntil = targetHour - current.getHours();
@@ -212,7 +183,7 @@ export default function Dashboard() {
     }
     return "now";
   };
-  
+
   // Get current time and day for realistic upcoming classes
   const getCurrentDay = () => {
     const days = [
@@ -236,15 +207,8 @@ export default function Dashboard() {
           <p className="text-muted-foreground text-sm">
             Welcome back! Here's your academic overview.
           </p>
-          <h2>Testing Area</h2>
-      <button 
-        onClick={testCreateCourse} 
-        style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}
-      >
-        Test Create Course API
-      </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
@@ -289,8 +253,8 @@ export default function Dashboard() {
                           {classItem.status === "next"
                             ? "Next"
                             : classItem.status === "today"
-                            ? "Today"
-                            : "Tomorrow"}
+                              ? "Today"
+                              : "Tomorrow"}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">
@@ -344,8 +308,8 @@ export default function Dashboard() {
                         task.priority === "high"
                           ? "destructive"
                           : task.priority === "medium"
-                          ? "default"
-                          : "secondary"
+                            ? "default"
+                            : "secondary"
                       }
                     >
                       {task.priority}
@@ -375,7 +339,7 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    Due {assignment.due}
+                    Due {assignment.dueDate}
                   </span>
                 </div>
               ))}

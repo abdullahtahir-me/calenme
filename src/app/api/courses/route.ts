@@ -21,13 +21,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  if(query==="coursesName"){
+  if (query === "coursesName") {
     const { data: courses, error } = await supabase.from('courses').select('id,title,code').eq('user_id', user.id);
-    if(error){
+    if (error) {
       console.log(error);
-      return NextResponse.json(error, {status: 400});
+      return NextResponse.json(error, { status: 400 });
     }
-    return NextResponse.json(courses, {status: 200});
+    return NextResponse.json(courses, { status: 200 });
   }
 
 
