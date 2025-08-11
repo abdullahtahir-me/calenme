@@ -30,7 +30,7 @@ export default function AssignmentWidget() {
       console.log("Error occured in the assignment widget");
     }
     const data  = await response.json();
-    setUpcomingAssignments(data);
+    setUpcomingAssignments(data===null? [] : data);
     setLoading(false)
     setError(false);
     console.log(data);
@@ -40,7 +40,9 @@ export default function AssignmentWidget() {
   return (
     loading ? (<p>Loading . . . .</p>):(
     <div className="space-y-3">
-      {upcomingAssignments.map((assignment) => (
+      
+      {upcomingAssignments.length===0 ? <p>Hurrah! No ssignments this week</p>  :    
+      upcomingAssignments.map((assignment) => (
         <div
           key={assignment.id}
           className="flex items-center justify-between p-3 border border-border rounded-lg"
