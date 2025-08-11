@@ -164,6 +164,37 @@ export default function Assignments() {
     });
 
   };
+  const handleRemoveAssignment = async (id: string) => {
+    console.log("delete course request")
+    const response = await fetch(`/api/assignments/${id}`,{
+      method: "DELETE",
+      headers:{
+        "Content-Type": "application/json",
+      },
+    })
+
+    if(!response.ok){
+      alert("Error deleting the course.")
+    }
+    fetchAssignments();
+  }
+
+  const toggleAssignment = async (id: string, completed: boolean) => {
+    const response = await fetch(`/api/assignments/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ toggledState: !completed }),
+    });
+    if (response.ok) {
+      setAssignments(
+        assignments.map((assignment) =>
+          assignment.id === id ? { ...assignment, completed: !assignment.completed } : assignment
+        )
+      );
+    }
+  };
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -382,11 +413,11 @@ export default function Assignments() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    Edit Details
+                  <Button variant="outline" size="sm" onClick={()=>toggleAssignment(assignment.id,assignment.completed)}>
+                    {assignment.completed ? "Mark Pending" : "Mark Completed"}
                   </Button>
-                  <Button variant="outline" size="sm">
-                    View Details
+                  <Button variant="destructive" size="sm" onClick={()=>handleRemoveAssignment(assignment.id)}>
+                    Delete
                   </Button>
                 </div>
               </div>
