@@ -45,7 +45,7 @@ type ClassSession = {
 };
 
 type Course = {
-  id: number;
+  id: string;
   title: string;
   code: string;
   professor_name: string;
@@ -190,6 +190,21 @@ export default function Courses() {
     setSameVenue(true);
     setCommonVenue("");
   };
+
+  const handleRemoveCourse = async (id: string) => {
+    console.log("delete course request")
+    const response = await fetch(`/api/courses/${id}`,{
+      method: "DELETE",
+      headers:{
+        "Content-Type": "application/json",
+      },
+    })
+
+    if(!response.ok){
+      alert("Error deleting the course.")
+    }
+    fetchCourses();
+  }
 
   const getNextClassTime = (course: Course) => {
     if (course.nextClass) {
@@ -662,6 +677,7 @@ export default function Courses() {
                   </div>
                 )}
               </div>
+              <Button variant="destructive" onClick={()=>handleRemoveCourse(course.id)}>Delete Course</Button>
             </DialogContent>
           </Dialog>
         ))}

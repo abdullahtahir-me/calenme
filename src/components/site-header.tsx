@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
-import { POST } from "@/app/api/auth/login/route";
 
 export function SiteHeader() {
   const router = useRouter();
