@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,13 +15,13 @@ import {
 import { Plus, Filter } from "lucide-react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 type Priority = "low" | "medium" | "high";
 
 interface Task {
@@ -40,12 +40,15 @@ export default function Tasks() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+
+
   const fetchTasks = async () => {
-    setLoading(true);
     try {
       const response = await fetch("/api/tasks");
       if (!response.ok) {
         throw new Error("Error fetching the results");
+        setLoading(false);
       }
       const data = await response.json();
       setTasks(data);
@@ -58,6 +61,7 @@ export default function Tasks() {
       }
     }
   };
+
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -112,7 +116,7 @@ export default function Tasks() {
         setDescription("");
         setPriority("medium");
         setDueDate(null);
-        buttonRef.current?.click();
+        setShowAddDialog(false)
         fetchTasks();
       }
     }
@@ -124,7 +128,6 @@ export default function Tasks() {
     return true;
   });
   // console.log(tasks);
-  const buttonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <div className="p-6 space-y-6">
@@ -136,7 +139,7 @@ export default function Tasks() {
           </p>
         </div>
 
-        <Dialog>
+        <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogTrigger asChild>
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
@@ -196,11 +199,6 @@ export default function Tasks() {
               <Button onClick={addTask} className="w-full">
                 Add Task
               </Button>
-              <DialogClose asChild>
-                <Button ref={buttonRef} type="button" variant="default" hidden>
-                  Close
-                </Button>
-              </DialogClose>
             </div>
           </DialogContent>
         </Dialog>
@@ -223,58 +221,80 @@ export default function Tasks() {
 
       {/* Tasks List */}
       <div className="space-y-4">
-        {filteredTasks.map((task) => (
-          <Card
-            key={task.id}
-            className={`p-4 ${task.completed ? "opacity-60" : ""}`}
-          >
-            <div className="flex items-start gap-3">
-              <Checkbox
-                checked={task.completed}
-                onCheckedChange={() => toggleTask(task.id, task.completed)}
-                className="mt-1"
-              />
-              <div className="flex-1">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p
-                      className={`font-medium ${
-                        task.completed ? "line-through" : ""
-                      }`}
-                    >
-                      {task.title}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {task.description}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant={
-                        task.priority === "high"
-                          ? "destructive"
-                          : task.priority === "medium"
-                          ? "default"
-                          : "secondary"
-                      }
-                    >
-                      {task.priority}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">
-                      {task.due_date &&
-                        "Due:" +
-                          new Date(task.due_date).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                    </span>
+        {loading ? (
+          Array.from({ length: 10 }).map((_, i) => (
+          <div className="flex flex-col space-y-3" key={i}>
+            <Skeleton className="h-20 rounded-xl flex items-center justify-between p-5">
+              <div className="flex items-center space-x-3">
+                <Skeleton className="h-5 w-5 bg-zinc-200" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[150px] bg-zinc-200" />
+                  <Skeleton className="h-4 w-[300px] bg-zinc-200" />
+                </div>
+              </div>
+              <div className="flex space-x-3">
+                <Skeleton className="h-4 w-[50px] bg-zinc-200" />
+                <Skeleton className="h-4 w-[150px] bg-zinc-200" />
+              </div>
+            </Skeleton>
+          </div>
+        ))) : (
+          filteredTasks.map((task) => (
+            <Card
+              key={task.id}
+              className={`p-4 ${task.completed ? "opacity-60" : ""}`}
+            >
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  checked={task.completed}
+                  onCheckedChange={() => toggleTask(task.id, task.completed)}
+                  className="mt-1"
+                />
+                <div className="flex-1">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p
+                        className={`font-medium ${
+                          task.completed ? "line-through" : ""
+                        }`}
+                      >
+                        {task.title}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {task.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          task.priority === "high"
+                            ? "destructive"
+                            : task.priority === "medium"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {task.priority}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {task.due_date &&
+                          "Due:" +
+                            new Date(task.due_date).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );

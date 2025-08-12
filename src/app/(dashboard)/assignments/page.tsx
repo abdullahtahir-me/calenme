@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type assignmentType = "Exam" | "Project" | "Assignment";
 type Assignment = {
@@ -56,6 +57,7 @@ export default function Assignments() {
     description: "",
   });
   const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const assignmentsdata: Assignment[] = [
     {
@@ -93,29 +95,29 @@ export default function Assignments() {
   };
   const getDaysUntilDue = (dueDate: Date) => {
     if (!dueDate) {
-    return null; // Or return a large number, or some other default
-  }
+      return null; // Or return a large number, or some other default
+    }
 
-  const today = new Date();
-  // 2. THIS IS THE FIX: Create a new Date object from the incoming string.
-  //    The `new Date()` constructor is excellent at parsing ISO date strings.
-  const due = new Date(dueDate);
+    const today = new Date();
+    // 2. THIS IS THE FIX: Create a new Date object from the incoming string.
+    //    The `new Date()` constructor is excellent at parsing ISO date strings.
+    const due = new Date(dueDate);
 
-  // 3. Check if the date was valid. If an invalid string was passed,
-  //    `due.getTime()` will be NaN (Not a Number).
-  if (isNaN(due.getTime())) {
-    return null;
-  }
+    // 3. Check if the date was valid. If an invalid string was passed,
+    //    `due.getTime()` will be NaN (Not a Number).
+    if (isNaN(due.getTime())) {
+      return null;
+    }
 
-  // Set both dates to the start of their respective days for an accurate day count
-  today.setHours(0, 0, 0, 0);
-  due.setHours(0, 0, 0, 0);
-  
-  const diffTime = due.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  return diffDays;
-    // 
+    // Set both dates to the start of their respective days for an accurate day count
+    today.setHours(0, 0, 0, 0);
+    due.setHours(0, 0, 0, 0);
+
+    const diffTime = due.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+    //
   };
   const [showAddDialog, setShowAddDialog] = useState(false);
 
@@ -129,16 +131,17 @@ export default function Assignments() {
 
   const fetchAssignments = async () => {
     const response = await fetch("/api/assignments");
-    if(!response.ok){
-      console.log("error fetching the courses")
+    if (!response.ok) {
+      console.log("error fetching the courses");
     }
     const data = await response.json();
     setAssignments(data);
-  }
+    setLoading(false);
+  };
 
   const handleAddAssignment = async () => {
     console.log(newAssignment);
-    setShowAddDialog(false)
+    setShowAddDialog(false);
     const response = await fetch("/api/assignments", {
       method: "POST",
       headers: {
@@ -162,22 +165,21 @@ export default function Assignments() {
       completed: false,
       description: "",
     });
-
   };
   const handleRemoveAssignment = async (id: string) => {
-    console.log("delete course request")
-    const response = await fetch(`/api/assignments/${id}`,{
+    console.log("delete course request");
+    const response = await fetch(`/api/assignments/${id}`, {
       method: "DELETE",
-      headers:{
+      headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    if(!response.ok){
-      alert("Error deleting the course.")
+    if (!response.ok) {
+      alert("Error deleting the course.");
     }
     fetchAssignments();
-  }
+  };
 
   const toggleAssignment = async (id: string, completed: boolean) => {
     const response = await fetch(`/api/assignments/${id}`, {
@@ -190,7 +192,9 @@ export default function Assignments() {
     if (response.ok) {
       setAssignments(
         assignments.map((assignment) =>
-          assignment.id === id ? { ...assignment, completed: !assignment.completed } : assignment
+          assignment.id === id
+            ? { ...assignment, completed: !assignment.completed }
+            : assignment
         )
       );
     }
@@ -362,68 +366,100 @@ export default function Assignments() {
 
       {/* Assignments List */}
       <div className="space-y-4">
-        {assignments.map((assignment) => {
-          const daysUntilDue = getDaysUntilDue(assignment.dueDate);
+        {loading
+          ? Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton className="rounded-xl p-5 space-y-4" key={i}>
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-5 w-60 bg-zinc-200" />
+                  <Skeleton className="h-5 w-15 bg-zinc-200" />
+                </div>
+                <div className="flex justify-between">
+                  <Skeleton className="h-20 w-60 bg-zinc-200" />
+                  <Skeleton className="h-20 w-20 bg-zinc-200" />
+                </div>
+                <div className="flex space-x-3 justify-start">
+                  <Skeleton className="h-8 w-25 bg-zinc-200" />
+                  <Skeleton className="h-8 w-25 bg-zinc-200" />
+                </div>
+              </Skeleton>
+            ))
+          : assignments.map((assignment) => {
+              const daysUntilDue = getDaysUntilDue(assignment.dueDate);
 
-          return (
-            <Card key={assignment.id} className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3>{assignment.title}</h3>
-                      <Badge variant="outline">{assignment.type}</Badge>
-                    </div>
-                    <p className="text-muted-foreground">{assignment.course}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {assignment.description}
-                    </p>
-                  </div>
+              return (
+                <Card key={assignment.id} className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <h3>{assignment.title}</h3>
+                          <Badge variant="outline">{assignment.type}</Badge>
+                        </div>
+                        <p className="text-muted-foreground">
+                          {assignment.course}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {assignment.description}
+                        </p>
+                      </div>
 
-                  <div className="text-right space-y-1">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-2 h-2 rounded-full ${getStatusColor(
-                          assignment.completed
-                        )}`}
-                      />
-                      <span className="text-sm">
-                        {getStatusText(assignment.completed)}
-                      </span>
+                      <div className="text-right space-y-1">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className={`w-2 h-2 rounded-full ${getStatusColor(
+                              assignment.completed
+                            )}`}
+                          />
+                          <span className="text-sm">
+                            {getStatusText(assignment.completed)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Due:{" "}
+                          {new Date(assignment.dueDate).toLocaleDateString()}
+                        </p>
+                        {daysUntilDue !== null && daysUntilDue >= 0 && (
+                          <p
+                            className={`text-sm ${
+                              daysUntilDue <= 3
+                                ? "text-red-600"
+                                : "text-muted-foreground"
+                            }`}
+                          >
+                            {daysUntilDue === 0
+                              ? "Due today"
+                              : daysUntilDue === 1
+                              ? "Due tomorrow"
+                              : `${daysUntilDue} days left`}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      Due: {new Date(assignment.dueDate).toLocaleDateString()}
-                    </p>
-                    {(daysUntilDue!== null && daysUntilDue >= 0) && (
-                      <p
-                        className={`text-sm ${
-                          daysUntilDue <= 3
-                            ? "text-red-600"
-                            : "text-muted-foreground"
-                        }`}
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          toggleAssignment(assignment.id, assignment.completed)
+                        }
                       >
-                        {daysUntilDue === 0
-                          ? "Due today"
-                          : daysUntilDue === 1
-                          ? "Due tomorrow"
-                          : `${daysUntilDue} days left`}
-                      </p>
-                    )}
+                        {assignment.completed
+                          ? "Mark Pending"
+                          : "Mark Completed"}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveAssignment(assignment.id)}
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={()=>toggleAssignment(assignment.id,assignment.completed)}>
-                    {assignment.completed ? "Mark Pending" : "Mark Completed"}
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={()=>handleRemoveAssignment(assignment.id)}>
-                    Delete
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
+                </Card>
+              );
+            })}
       </div>
     </div>
   );

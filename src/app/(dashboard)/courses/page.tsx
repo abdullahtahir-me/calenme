@@ -35,6 +35,7 @@ import {
   X,
   Edit,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ClassSession = {
   day: string;
@@ -88,7 +89,6 @@ export default function Courses() {
     }
   };
 
-
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -111,7 +111,16 @@ export default function Courses() {
 
   const totalCredits = courses.reduce((sum, course) => sum + course.credits, 0);
 
-  const colors = ["bg-blue-500", "bg-green-500", "bg-purple-500", "bg-red-500", "bg-orange-500", "bg-teal-500", "bg-pink-500", "bg-indigo-500"];
+  const colors = [
+    "bg-blue-500",
+    "bg-green-500",
+    "bg-purple-500",
+    "bg-red-500",
+    "bg-orange-500",
+    "bg-teal-500",
+    "bg-pink-500",
+    "bg-indigo-500",
+  ];
 
   const addSession = () => {
     setSessions([
@@ -142,9 +151,9 @@ export default function Courses() {
 
   const handleAddCourse = async () => {
     setShowAddDialog(false);
-    newCourse.sessions = sessions
+    newCourse.sessions = sessions;
     console.log("Sending the following data to the API:", newCourse);
-    console.log(sessions)
+    console.log(sessions);
     try {
       const response = await fetch("/api/courses", {
         method: "POST",
@@ -192,19 +201,19 @@ export default function Courses() {
   };
 
   const handleRemoveCourse = async (id: string) => {
-    console.log("delete course request")
-    const response = await fetch(`/api/courses/${id}`,{
+    console.log("delete course request");
+    const response = await fetch(`/api/courses/${id}`, {
       method: "DELETE",
-      headers:{
+      headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    if(!response.ok){
-      alert("Error deleting the course.")
+    if (!response.ok) {
+      alert("Error deleting the course.");
     }
     fetchCourses();
-  }
+  };
 
   const getNextClassTime = (course: Course) => {
     if (course.nextClass) {
@@ -531,156 +540,192 @@ export default function Courses() {
 
       {/* Courses Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {courses.map((course) => (
-          <Dialog key={course.id}>
-            <DialogTrigger asChild>
-              <Card className="p-6 cursor-pointer hover:shadow-md transition-shadow">
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-3 h-3 rounded-full ${course.color}`}
-                        />
-                        <h3>{course.title}</h3>
-                      </div>
-                      <p className="text-muted-foreground">{course.code}</p>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <User className="h-3 w-3" />
-                        <span>{course.professor_name}</span>
-                      </div>
-                    </div>
-
-                    <div className="text-right space-y-1">
-                      <p className="text-sm text-muted-foreground">
-                        {course.credits} credits
-                      </p>
-                    </div>
+        {loading
+          ? Array.from({ length: 9 }).map((_, i) => (
+                <Skeleton className="rounded-xl p-5 space-y-3" key={i}>
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-5 w-60 bg-zinc-200" />
+                    <Skeleton className="h-5 w-15 bg-zinc-200" />
                   </div>
-
-                  {/* Next Class Info */}
-                  {course.sessions && (
-                    <div className="p-3 bg-muted rounded-lg">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Clock className="h-4 w-4 text-primary" />
-                        <span className="font-medium text-sm">Next Class</span>
-                        <Badge variant="outline" className="text-xs">
-                          {course.sessions.at(0)?.type}
-                        </Badge>
-                      </div>
-                      <div className="space-y-1 text-sm">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3 text-muted-foreground" />
-                          <span>{`On ${course.sessions.at(0)?.day} at ${course.sessions.at(0)?.startTime.substring(0,5)}`}</span>
+                    <Skeleton className="h-4 w-30 bg-zinc-200" />
+                    <Skeleton className="h-30  bg-zinc-200" />
+                  <div className="flex space-x-3 justify-between">
+                    <Skeleton className="h-4 w-[150px] bg-zinc-200" />
+                    <Skeleton className="h-4 w-[50px] bg-zinc-200" />
+                  </div>
+                </Skeleton>
+            ))
+          : courses.map((course) => (
+              <Dialog key={course.id}>
+                <DialogTrigger asChild>
+                  <Card className="p-6 cursor-pointer hover:shadow-md transition-shadow">
+                    <div className="space-y-4">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`w-3 h-3 rounded-full ${course.color}`}
+                            />
+                            <h3>{course.title}</h3>
+                          </div>
+                          <p className="text-muted-foreground">{course.code}</p>
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <User className="h-3 w-3" />
+                            <span>{course.professor_name}</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3 text-muted-foreground" />
-                          <span>{course.sessions.at(0)?.venue}</span>
+
+                        <div className="text-right space-y-1">
+                          <p className="text-sm text-muted-foreground">
+                            {course.credits} credits
+                          </p>
                         </div>
                       </div>
-                    </div>
-                  )}
 
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Assignments:</span>
-                    <span>{course.assignments} total</span>
-                  </div>
-                </div>
-              </Card>
-            </DialogTrigger>
-
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${course.color}`} />
-                  {course.title} ({course.code})
-                </DialogTitle>
-              </DialogHeader>
-
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm font-medium">Instructor</Label>
-                    <p className="text-sm text-muted-foreground">
-                      {course.professor_name}
-                    </p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Credits</Label>
-                    <p className="text-sm text-muted-foreground">
-                      {course.credits}
-                    </p>
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium">Assignments</Label>
-                    <p className="text-sm text-muted-foreground">
-                      {course.assignments} total
-                    </p>
-                  </div>
-                </div>
-
-                {course.description && (
-                  <div>
-                    <Label className="text-sm font-medium">Description</Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {course.description}
-                    </p>
-                  </div>
-                )}
-
-                {course.sessions?.length > 0 && (
-                  <div>
-                    <Label className="text-sm font-medium mb-3 block">
-                      Full Schedule
-                    </Label>
-                    <div className="space-y-3">
-                      {course.sessions.map((session, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-3 border rounded-lg"
-                        >
-                          <div className="flex items-center gap-3">
+                      {/* Next Class Info */}
+                      {course.sessions && (
+                        <div className="p-3 bg-muted rounded-lg">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Clock className="h-4 w-4 text-primary" />
+                            <span className="font-medium text-sm">
+                              Next Class
+                            </span>
+                            <Badge variant="outline" className="text-xs">
+                              {course.sessions.at(0)?.type}
+                            </Badge>
+                          </div>
+                          <div className="space-y-1 text-sm">
                             <div className="flex items-center gap-1">
-                              {session.type === "lecture" ? (
-                                <GraduationCap className="h-4 w-4 text-blue-500" />
-                              ) : (
-                                <Beaker className="h-4 w-4 text-green-500" />
-                              )}
-                              <Badge
-                                variant={
-                                  session.type === "lecture"
-                                    ? "default"
-                                    : "secondary"
-                                }
-                                className="text-xs"
-                              >
-                                {session.type}
-                              </Badge>
+                              <Calendar className="h-3 w-3 text-muted-foreground" />
+                              <span>{`On ${
+                                course.sessions.at(0)?.day
+                              } at ${course.sessions
+                                .at(0)
+                                ?.startTime.substring(0, 5)}`}</span>
                             </div>
-                            <span className="font-medium">{session.day}</span>
-                          </div>
-                          <div className="text-right">
-                            <div className="flex items-center gap-1 text-sm">
-                              <Clock className="h-3 w-3" />
-                              <span>
-                                {session.startTime} - {session.endTime}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              <MapPin className="h-3 w-3" />
-                              <span>{session.venue}</span>
+                            <div className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                              <span>{course.sessions.at(0)?.venue}</span>
                             </div>
                           </div>
                         </div>
-                      ))}
+                      )}
+
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          Assignments:
+                        </span>
+                        <span>{course.assignments} total</span>
+                      </div>
                     </div>
+                  </Card>
+                </DialogTrigger>
+
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${course.color}`} />
+                      {course.title} ({course.code})
+                    </DialogTitle>
+                  </DialogHeader>
+
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">
+                          Instructor
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {course.professor_name}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium">Credits</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {course.credits}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium">
+                          Assignments
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                          {course.assignments} total
+                        </p>
+                      </div>
+                    </div>
+
+                    {course.description && (
+                      <div>
+                        <Label className="text-sm font-medium">
+                          Description
+                        </Label>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {course.description}
+                        </p>
+                      </div>
+                    )}
+
+                    {course.sessions?.length > 0 && (
+                      <div>
+                        <Label className="text-sm font-medium mb-3 block">
+                          Full Schedule
+                        </Label>
+                        <div className="space-y-3">
+                          {course.sessions.map((session, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between p-3 border rounded-lg"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1">
+                                  {session.type === "lecture" ? (
+                                    <GraduationCap className="h-4 w-4 text-blue-500" />
+                                  ) : (
+                                    <Beaker className="h-4 w-4 text-green-500" />
+                                  )}
+                                  <Badge
+                                    variant={
+                                      session.type === "lecture"
+                                        ? "default"
+                                        : "secondary"
+                                    }
+                                    className="text-xs"
+                                  >
+                                    {session.type}
+                                  </Badge>
+                                </div>
+                                <span className="font-medium">
+                                  {session.day}
+                                </span>
+                              </div>
+                              <div className="text-right">
+                                <div className="flex items-center gap-1 text-sm">
+                                  <Clock className="h-3 w-3" />
+                                  <span>
+                                    {session.startTime} - {session.endTime}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                  <MapPin className="h-3 w-3" />
+                                  <span>{session.venue}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <Button variant="destructive" onClick={()=>handleRemoveCourse(course.id)}>Delete Course</Button>
-            </DialogContent>
-          </Dialog>
-        ))}
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleRemoveCourse(course.id)}
+                  >
+                    Delete Course
+                  </Button>
+                </DialogContent>
+              </Dialog>
+            ))}
       </div>
     </div>
   );

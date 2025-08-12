@@ -2,6 +2,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, User } from "lucide-react";
 import { useEffect, useState } from "react";
+import { MoonLoader } from "react-spinners";
 
 type ScheduledClass = {
   sessionId: string;
@@ -19,7 +20,7 @@ type ScheduledClass = {
 
 export default function ScheduleWidget() {
   const [upcomingClasses, setUpcomingClasses] = useState<ScheduledClass[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -36,21 +37,22 @@ export default function ScheduleWidget() {
       console.log("Error occured in the assignment widget");
     }
     const data = await response.json();
-    setUpcomingClasses(data);
+    setUpcomingClasses(data===null? [] : data);
     setLoading(false);
     setError(false);
     console.log(data);
   };
 
   return loading ? (
-    <p>Loading . . . .</p>
+    <div className="grid place-items-center"><MoonLoader size={30} speedMultiplier={0.6} /></div>
   ) : (
     // Inside your TodaysClassesWidget component...
 
     // Assume 'todaysCourses' is the array you fetched from the API.
 
     <div className="space-y-4">
-      {upcomingClasses.map((course) => (
+      {upcomingClasses.length===0 ? <p>Hurrah! No Classes today</p>  :
+      upcomingClasses.map((course) => (
         <div
           key={course.sessionId}
           className="relative p-3 border border-border rounded-lg"
@@ -108,3 +110,40 @@ export default function ScheduleWidget() {
     </div>
   );
 }
+
+
+
+// Fuctions for later use
+// const formatTimeUntil = (time: string) => {
+//     // This would calculate actual time until class in a real app
+//     const current = new Date();
+//     const hour = parseInt(time.split(":")[0]);
+//     const isAM = time.includes("AM");
+//     const targetHour = isAM
+//       ? hour === 12
+//         ? 0
+//         : hour
+//       : hour === 12
+//         ? 12
+//         : hour + 12;
+
+//     if (targetHour > current.getHours()) {
+//       const hoursUntil = targetHour - current.getHours();
+//       return hoursUntil === 1 ? "in 1 hour" : `in ${hoursUntil} hours`;
+//     }
+//     return "now";
+//   };
+
+//   // Get current time and day for realistic upcoming classes
+//   const getCurrentDay = () => {
+//     const days = [
+//       "Sunday",
+//       "Monday",
+//       "Tuesday",
+//       "Wednesday",
+//       "Thursday",
+//       "Friday",
+//       "Saturday",
+//     ];
+//     return days[new Date().getDay()];
+//   };

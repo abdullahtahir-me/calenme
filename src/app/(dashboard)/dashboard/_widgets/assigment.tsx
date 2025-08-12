@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MoonLoader } from "react-spinners"
 
 type AssignmentType = "Exam" | "Assignment" | "Project"
 
@@ -13,7 +14,7 @@ type UpcomingAssignments = {
 }
 export default function AssignmentWidget() {
   const [upcomingAssignments, setUpcomingAssignments] = useState<UpcomingAssignments[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(()=>{
@@ -38,7 +39,7 @@ export default function AssignmentWidget() {
   }
 
   return (
-    loading ? (<p>Loading . . . .</p>):(
+    loading ? (<div className="grid place-items-center"><MoonLoader size={30} speedMultiplier={0.6} /></div>):(
     <div className="space-y-3">
       
       {upcomingAssignments.length===0 ? <p>Hurrah! No ssignments this week</p>  :    

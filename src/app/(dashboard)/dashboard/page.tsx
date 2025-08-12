@@ -1,56 +1,34 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  BookOpen,
-  CheckSquare,
-  Clock,
-  MapPin,
-  User,
-} from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { BookOpen, CheckSquare, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import AssignmentWidget from "./_widgets/assigment";
 import TasksWidget from "./_widgets/tasks";
 import ScheduleWidget from "./_widgets/schedule";
+import { MoonLoader } from "react-spinners";
 
-type Priority = "low" | "medium" | "high";
-
-
-type Task = {
-  id: number;
-  title: string;
-  course: string;
-  priority: Priority;
-  due_date: string;
-}
 
 export default function Dashboard() {
   useEffect(() => {
     fetchData();
   }, [])
 
-
   const [activeCourses, setActiveCourses] = useState("");
   const [pendingAssignments, setPendingAssignments] = useState("")
   const [pendingTasks, setPendingTasks] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     const response = await fetch("/api/dashboard");
     if (!response.ok) {
       alert("Can't fetch the stats")
+      setLoading(false)
     }
     const data = await response.json();
     setActiveCourses(data.courses);
     setPendingAssignments(data.assignments);
     setPendingTasks(data.tasks);
+    setLoading(false)
   }
 
 
@@ -74,117 +52,8 @@ export default function Dashboard() {
       color: "text-chart-3",
     },
   ];
-  const upcomingClasses = [
-    {
-      id: 1,
-      name: "Calculus I",
-      code: "MATH 101",
-      time: "9:00 AM",
-      endTime: "10:00 AM",
-      location: "Math Building 205",
-      instructor: "Dr. Sarah Johnson",
-      color: "bg-blue-500",
-      status: "next", // This would be the next class
-    },
-    {
-      id: 2,
-      name: "Introduction to Biology",
-      code: "BIO 101",
-      time: "11:00 AM",
-      endTime: "12:30 PM",
-      location: "Science Hall 110",
-      instructor: "Prof. Michael Chen",
-      color: "bg-green-500",
-      status: "today",
-    },
-    {
-      id: 3,
-      name: "General Chemistry",
-      code: "CHEM 101",
-      time: "2:00 PM",
-      endTime: "3:00 PM",
-      location: "Chemistry Lab 201",
-      instructor: "Dr. Emily Rodriguez",
-      color: "bg-purple-500",
-      status: "today",
-    },
-    {
-      id: 4,
-      name: "Intro to Programming",
-      code: "CS 101",
-      time: "10:00 AM",
-      endTime: "11:00 AM",
-      location: "Computer Lab 150",
-      instructor: "Dr. Alex Kim",
-      color: "bg-red-500",
-      status: "tomorrow",
-    },
-  ];
-  const recentTasks = [
-    {
-      id: 1,
-      title: "Complete Math Assignment",
-      course: "Calculus I",
-      due: "Today",
-      priority: "high",
-    },
-    {
-      id: 2,
-      title: "Read Chapter 5",
-      course: "Biology",
-      due: "Tomorrow",
-      priority: "medium",
-    },
-    {
-      id: 3,
-      title: "Prepare for Quiz",
-      course: "Chemistry",
-      due: "Oct 15",
-      priority: "high",
-    },
-    {
-      id: 4,
-      title: "Submit Lab Report",
-      course: "Physics",
-      due: "Oct 18",
-      priority: "low",
-    },
-  ];
   
 
-  const formatTimeUntil = (time: string) => {
-    // This would calculate actual time until class in a real app
-    const current = new Date();
-    const hour = parseInt(time.split(":")[0]);
-    const isAM = time.includes("AM");
-    const targetHour = isAM
-      ? hour === 12
-        ? 0
-        : hour
-      : hour === 12
-        ? 12
-        : hour + 12;
-
-    if (targetHour > current.getHours()) {
-      const hoursUntil = targetHour - current.getHours();
-      return hoursUntil === 1 ? "in 1 hour" : `in ${hoursUntil} hours`;
-    }
-    return "now";
-  };
-
-  // Get current time and day for realistic upcoming classes
-  const getCurrentDay = () => {
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    return days[new Date().getDay()];
-  };
   return (
     <>
       <div className="p-3 space-y-6">
@@ -204,7 +73,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground">{stat.title}</p>
-                    <p className="text-2xl font-semibold">{stat.value}</p>
+                    <p className="text-2xl font-semibold">{loading ? <MoonLoader size={25} speedMultiplier={0.6} /> :stat.value}</p>
                   </div>
                   <Icon className={`h-8 w-8 ${stat.color}`} />
                 </div>
@@ -212,6 +81,8 @@ export default function Dashboard() {
             );
           })}
         </div>
+
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="p-6">
             <h3 className="mb-4 flex items-center gap-2">
