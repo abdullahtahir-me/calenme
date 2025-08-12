@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Filter } from "lucide-react";
+import { Plus, Filter, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,11 +22,12 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import MoonLoader from "react-spinners/MoonLoader";
 type Priority = "low" | "medium" | "high";
 
 interface Task {
   created_at: string | number | Date;
-  id: number;
+  id: string;
   title: string;
   description: string;
   course: string;
@@ -39,9 +40,9 @@ export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [deleteId, setDeleteId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
-
 
   const fetchTasks = async () => {
     try {
@@ -66,7 +67,7 @@ export default function Tasks() {
     fetchTasks();
   }, []);
 
-  const toggleTask = async (id: number, completed: boolean) => {
+  const toggleTask = async (id: string, completed: boolean) => {
     const response = await fetch(`/api/tasks/${id}`, {
       method: "PATCH",
       headers: {
@@ -116,12 +117,27 @@ export default function Tasks() {
         setDescription("");
         setPriority("medium");
         setDueDate(null);
-        setShowAddDialog(false)
+        setShowAddDialog(false);
         fetchTasks();
       }
     }
   };
+  const handleRemoveTask = async (id: string) => {
+    setDeleteId(id)
+    console.log("delete course request");
+    const response = await fetch(`/api/tasks/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
+    if (!response.ok) {
+      alert("Error deleting the course.");
+    }
+    fetchTasks();
+    setDeleteId("")
+  };
   const filteredTasks = tasks.filter((task) => {
     if (filter === "completed") return task.completed;
     if (filter === "pending") return !task.completed;
@@ -221,80 +237,89 @@ export default function Tasks() {
 
       {/* Tasks List */}
       <div className="space-y-4">
-        {loading ? (
-          Array.from({ length: 10 }).map((_, i) => (
-          <div className="flex flex-col space-y-3" key={i}>
-            <Skeleton className="h-20 rounded-xl flex items-center justify-between p-5">
-              <div className="flex items-center space-x-3">
-                <Skeleton className="h-5 w-5 bg-zinc-200" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[150px] bg-zinc-200" />
-                  <Skeleton className="h-4 w-[300px] bg-zinc-200" />
-                </div>
-              </div>
-              <div className="flex space-x-3">
-                <Skeleton className="h-4 w-[50px] bg-zinc-200" />
-                <Skeleton className="h-4 w-[150px] bg-zinc-200" />
-              </div>
-            </Skeleton>
-          </div>
-        ))) : (
-          filteredTasks.map((task) => (
-            <Card
-              key={task.id}
-              className={`p-4 ${task.completed ? "opacity-60" : ""}`}
-            >
-              <div className="flex items-start gap-3">
-                <Checkbox
-                  checked={task.completed}
-                  onCheckedChange={() => toggleTask(task.id, task.completed)}
-                  className="mt-1"
-                />
-                <div className="flex-1">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p
-                        className={`font-medium ${
-                          task.completed ? "line-through" : ""
-                        }`}
-                      >
-                        {task.title}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {task.description}
-                      </p>
+        {loading
+          ? Array.from({ length: 10 }).map((_, i) => (
+              <div className="flex flex-col space-y-3" key={i}>
+                <Skeleton className="h-20 rounded-xl flex items-center justify-between p-5">
+                  <div className="flex items-center space-x-3">
+                    <Skeleton className="h-5 w-5 bg-zinc-200" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-[150px] bg-zinc-200" />
+                      <Skeleton className="h-4 w-[300px] bg-zinc-200" />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={
-                          task.priority === "high"
-                            ? "destructive"
-                            : task.priority === "medium"
-                            ? "default"
-                            : "secondary"
+                  </div>
+                  <div className="flex space-x-3">
+                    <Skeleton className="h-4 w-[50px] bg-zinc-200" />
+                    <Skeleton className="h-4 w-[150px] bg-zinc-200" />
+                  </div>
+                </Skeleton>
+              </div>
+            ))
+          : filteredTasks.map((task) => (
+              <Card
+                key={task.id}
+                className={`p-4 ${task.completed ? "opacity-60" : ""}`}
+              >
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    checked={task.completed}
+                    onCheckedChange={() => toggleTask(task.id, task.completed)}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p
+                          className={`font-medium ${
+                            task.completed ? "line-through" : ""
+                          }`}
+                        >
+                          {task.title}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1 md:max-w-[50vw]">
+                          {task.description}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant={
+                            task.priority === "high"
+                              ? "destructive"
+                              : task.priority === "medium"
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
+                          {task.priority}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          {task.due_date &&
+                            "Due:" +
+                              new Date(task.due_date).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                }
+                              )}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          className="w-7 h-7 hover:bg-gray-50 flex p-0 items-center justify-center"
+                          onClick={()=>handleRemoveTask(task.id)}
+                  
+                        > {task.id == deleteId ?
+                        // >{true ?
+                          <MoonLoader size={18} speedMultiplier={0.6} />:<X className="stroke-gray-[#000000]" />
                         }
-                      >
-                        {task.priority}
-                      </Badge>
-                      <span className="text-sm text-muted-foreground">
-                        {task.due_date &&
-                          "Due:" +
-                            new Date(task.due_date).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                              }
-                            )}
-                      </span>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </Card>
-          ))
-        )}
+              </Card>
+            ))}
       </div>
     </div>
   );
