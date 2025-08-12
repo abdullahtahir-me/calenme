@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, FileText, Clock, Plus } from "lucide-react";
+import { Calendar, FileText, Clock, Plus, Loader2Icon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -47,6 +47,12 @@ type Course = {
 };
 
 export default function Assignments() {
+  const [markToggleLoading, setMarkToggleLoading] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState("");
+  const [addLoading, setAddLoading] = useState(false);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddDialog, setShowAddDialog] = useState(false);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [newAssignment, setNewAssignment] = useState<newAssignment>({
     title: "",
@@ -56,34 +62,8 @@ export default function Assignments() {
     completed: false,
     description: "",
   });
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const assignmentsdata: Assignment[] = [
-    {
-      id: "1",
-      title: "Calculus Midterm Exam",
-      course: "Calculus I",
-      type: "Exam",
-      dueDate: new Date("2024-10-20"),
-      completed: true,
-      description: "Comprehensive exam covering chapters 1-6",
-    },
-    {
-      id: "2",
-      title: "History Research Paper",
-      course: "American History",
-      type: "Exam",
-      dueDate: new Date("2024-10-25"),
-      completed: false,
-      description: "15-page research paper on the Industrial Revolution",
-    },
-  ];
 
-  useEffect(() => {
-    fetchAssignments();
-    getCourse();
-  }, []);
 
   const getStatusColor = (status: boolean) => {
     if (status) return "bg-green-500";
@@ -119,7 +99,6 @@ export default function Assignments() {
     return diffDays;
     //
   };
-  const [showAddDialog, setShowAddDialog] = useState(false);
 
   const getCourse = async () => {
     const response = await fetch("/api/courses?query=coursesName");
@@ -130,18 +109,19 @@ export default function Assignments() {
   };
 
   const fetchAssignments = async () => {
+    setLoading(true);
     const response = await fetch("/api/assignments");
     if (!response.ok) {
       console.log("error fetching the courses");
     }
     const data = await response.json();
-    setAssignments(data);
+    setAssignments(data===null?[]:data);
     setLoading(false);
   };
 
   const handleAddAssignment = async () => {
+    setAddLoading(true);
     console.log(newAssignment);
-    setShowAddDialog(false);
     const response = await fetch("/api/assignments", {
       method: "POST",
       headers: {
@@ -165,8 +145,11 @@ export default function Assignments() {
       completed: false,
       description: "",
     });
+    setShowAddDialog(false);
+    setAddLoading(false)
   };
   const handleRemoveAssignment = async (id: string) => {
+    setDeleteLoading(id);
     console.log("delete course request");
     const response = await fetch(`/api/assignments/${id}`, {
       method: "DELETE",
@@ -179,9 +162,11 @@ export default function Assignments() {
       alert("Error deleting the course.");
     }
     fetchAssignments();
+    setDeleteLoading("");
   };
 
   const toggleAssignment = async (id: string, completed: boolean) => {
+    setMarkToggleLoading(id);
     const response = await fetch(`/api/assignments/${id}`, {
       method: "PATCH",
       headers: {
@@ -198,7 +183,18 @@ export default function Assignments() {
         )
       );
     }
+    setMarkToggleLoading("");
   };
+
+
+
+  useEffect(() => {
+    fetchAssignments();
+    getCourse();
+  }, []);
+
+
+
   return (
     <div className="p-6 space-y-6">
       <div>
@@ -221,7 +217,7 @@ export default function Assignments() {
           </DialogHeader>
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="name">Title</Label>
                 <Input
                   id="title"
@@ -235,7 +231,7 @@ export default function Assignments() {
                   placeholder="Title"
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="dueDate">Due Date</Label>
                 <Input
                   id="dueDate"
@@ -251,7 +247,7 @@ export default function Assignments() {
               </div>
             </div>
             <div className="grid grid-cols-1 space-y-4 md:grid-cols-2 ">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="type">Type</Label>
                 <Select
                   value={newAssignment.type}
@@ -273,7 +269,7 @@ export default function Assignments() {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="course">Course</Label>
                 <Select
                   value={newAssignment.course_id}
@@ -296,7 +292,7 @@ export default function Assignments() {
                 </Select>
               </div>
             </div>
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <Input
                 id="description"
@@ -316,7 +312,7 @@ export default function Assignments() {
             <Button variant="outline" onClick={() => setShowAddDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleAddAssignment}>Add Assignment</Button>
+            <Button onClick={handleAddAssignment} disabled={addLoading}>{addLoading ? <Loader2Icon className="animate-spin" /> : "Add Assignment"}</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -440,11 +436,13 @@ export default function Assignments() {
                       <Button
                         variant="outline"
                         size="sm"
+                        className="w-35"
                         onClick={() =>
                           toggleAssignment(assignment.id, assignment.completed)
                         }
-                      >
-                        {assignment.completed
+                        disabled={markToggleLoading==assignment.id}
+                      > 
+                        {markToggleLoading == assignment.id? <Loader2Icon className="animate-spin" />: assignment.completed
                           ? "Mark Pending"
                           : "Mark Completed"}
                       </Button>
@@ -452,8 +450,10 @@ export default function Assignments() {
                         variant="destructive"
                         size="sm"
                         onClick={() => handleRemoveAssignment(assignment.id)}
+                        className="w-15"
+                        disabled={deleteLoading==assignment.id}
                       >
-                        Delete
+                        {deleteLoading==assignment.id ? <Loader2Icon className="animate-spin"/>:"Delete"}
                       </Button>
                     </div>
                   </div>

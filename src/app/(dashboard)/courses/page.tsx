@@ -34,6 +34,7 @@ import {
   Beaker,
   X,
   Edit,
+  Loader2Icon,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -67,6 +68,10 @@ export default function Courses() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState("");
+  const [addLoading, setAddLoading] = useState(false);
+  
+
   const fetchCourses = async () => {
     setLoading(true);
     try {
@@ -78,7 +83,7 @@ export default function Courses() {
       const data = await response.json();
       console.log("data fetched succgull");
       console.log(data);
-      setCourses(data);
+      setCourses(data===null?[]:data);
       setLoading(false);
     } catch (err) {
       if (err instanceof Error) {
@@ -150,7 +155,7 @@ export default function Courses() {
   };
 
   const handleAddCourse = async () => {
-    setShowAddDialog(false);
+    setAddLoading(true);
     newCourse.sessions = sessions;
     console.log("Sending the following data to the API:", newCourse);
     console.log(sessions);
@@ -163,10 +168,10 @@ export default function Courses() {
         // We convert our JavaScript object into a JSON string for transport.
         body: JSON.stringify(newCourse),
       });
-
+      
       // Get the response body as JSON
       const result = await response.json();
-
+      
       // Check if the HTTP response status is OK (e.g., 200, 201)
       if (!response.ok) {
         // If the server returned an error, log it to the console
@@ -179,6 +184,8 @@ export default function Courses() {
         fetchCourses();
         // alert("Course created successfully! Check your database and the console.");
       }
+      setShowAddDialog(false);
+      setAddLoading(false)
     } catch (error) {
       // This catches network errors (e.g., server is down, no internet)
       console.error("A network or fetch error occurred:", error);
@@ -201,6 +208,7 @@ export default function Courses() {
   };
 
   const handleRemoveCourse = async (id: string) => {
+    setDeleteLoading(id);
     console.log("delete course request");
     const response = await fetch(`/api/courses/${id}`, {
       method: "DELETE",
@@ -213,6 +221,7 @@ export default function Courses() {
       alert("Error deleting the course.");
     }
     fetchCourses();
+    setDeleteLoading("")
   };
 
   const getNextClassTime = (course: Course) => {
@@ -481,7 +490,7 @@ export default function Courses() {
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleAddCourse}>Add Course</Button>
+                <Button onClick={handleAddCourse}disabled={addLoading}>{addLoading ? <Loader2Icon className="animate-spin" /> : "Add Course"}</Button>
               </div>
             </div>
           </DialogContent>
@@ -720,8 +729,8 @@ export default function Courses() {
                   <Button
                     variant="destructive"
                     onClick={() => handleRemoveCourse(course.id)}
-                  >
-                    Delete Course
+                    disabled={deleteLoading==course.id}
+                  >{deleteLoading==course.id ? <Loader2Icon className="animate-spin" />: "Delete Course" }
                   </Button>
                 </DialogContent>
               </Dialog>

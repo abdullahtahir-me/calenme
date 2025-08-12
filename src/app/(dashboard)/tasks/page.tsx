@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Filter, X } from "lucide-react";
+import { Plus, Filter, X, PlusIcon, Loader2Icon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -37,19 +37,27 @@ interface Task {
 }
 
 export default function Tasks() {
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  //Hooks for the add task inputs
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState<Priority>("medium");
+  const [dueDate, setDueDate] = useState<string | null>(null);
+
 
   const fetchTasks = async () => {
+    setLoading(true);
     try {
       const response = await fetch("/api/tasks");
       if (!response.ok) {
-        throw new Error("Error fetching the results");
         setLoading(false);
+        throw new Error("Error fetching the results");
       }
       const data = await response.json();
       setTasks(data);
@@ -62,10 +70,6 @@ export default function Tasks() {
       }
     }
   };
-
-  useEffect(() => {
-    fetchTasks();
-  }, []);
 
   const toggleTask = async (id: string, completed: boolean) => {
     const response = await fetch(`/api/tasks/${id}`, {
@@ -84,12 +88,8 @@ export default function Tasks() {
     }
   };
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState<Priority>("medium");
-  const [dueDate, setDueDate] = useState<string | null>(null);
-
   const addTask = async () => {
+    setIsButtonLoading(true)
     if (title.trim()) {
       const response = await fetch("/api/tasks", {
         method: "POST",
@@ -108,6 +108,7 @@ export default function Tasks() {
         const errorData = await response.json();
         console.error("Failed to add task:", errorData.error);
         alert(`Error: ${errorData.error}`);
+        setIsButtonLoading(false)
       } else {
         // Success!
         const createdTask = await response.json();
@@ -117,13 +118,14 @@ export default function Tasks() {
         setDescription("");
         setPriority("medium");
         setDueDate(null);
+        setIsButtonLoading(false)
         setShowAddDialog(false);
         fetchTasks();
       }
     }
   };
   const handleRemoveTask = async (id: string) => {
-    setDeleteId(id)
+    setDeleteId(id);
     console.log("delete course request");
     const response = await fetch(`/api/tasks/${id}`, {
       method: "DELETE",
@@ -136,7 +138,7 @@ export default function Tasks() {
       alert("Error deleting the course.");
     }
     fetchTasks();
-    setDeleteId("")
+    setDeleteId("");
   };
   const filteredTasks = tasks.filter((task) => {
     if (filter === "completed") return task.completed;
@@ -144,6 +146,13 @@ export default function Tasks() {
     return true;
   });
   // console.log(tasks);
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+
+
 
   return (
     <div className="p-6 space-y-6">
@@ -212,8 +221,9 @@ export default function Tasks() {
                   onChange={(e) => setDueDate(e.target.value)}
                 />
               </div>
-              <Button onClick={addTask} className="w-full">
-                Add Task
+              <Button onClick={addTask} className="w-full" disabled={isButtonLoading}>
+                {isButtonLoading ? <Loader2Icon className="animate-spin" />: <PlusIcon />}
+                {isButtonLoading ? "Adding": "Add Task"}
               </Button>
             </div>
           </DialogContent>
@@ -307,12 +317,15 @@ export default function Tasks() {
                         <Button
                           variant="ghost"
                           className="w-7 h-7 hover:bg-gray-50 flex p-0 items-center justify-center"
-                          onClick={()=>handleRemoveTask(task.id)}
-                  
-                        > {task.id == deleteId ?
-                        // >{true ?
-                          <MoonLoader size={18} speedMultiplier={0.6} />:<X className="stroke-gray-[#000000]" />
-                        }
+                          onClick={() => handleRemoveTask(task.id)}
+                        >
+                          {" "}
+                          {task.id == deleteId ? (
+                            // >{true ?
+                            <Loader2Icon className="animate-spin" />
+                          ) : (
+                            <X className="stroke-gray-[#000000]" />
+                          )}
                         </Button>
                       </div>
                     </div>

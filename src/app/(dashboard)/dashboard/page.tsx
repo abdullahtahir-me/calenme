@@ -1,6 +1,6 @@
 "use client";
 import { Card } from "@/components/ui/card";
-import { BookOpen, CheckSquare, Clock } from "lucide-react";
+import { BookOpen, CheckSquare, Clock, Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import AssignmentWidget from "./_widgets/assigment";
 import TasksWidget from "./_widgets/tasks";
@@ -73,7 +73,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-muted-foreground">{stat.title}</p>
-                    <p className="text-2xl font-semibold">{loading ? <MoonLoader size={25} speedMultiplier={0.6} /> :stat.value}</p>
+                    <p className="text-2xl font-semibold">{loading ? <Loader2Icon className="animate-spin" /> :stat.value}</p>
                   </div>
                   <Icon className={`h-8 w-8 ${stat.color}`} />
                 </div>
