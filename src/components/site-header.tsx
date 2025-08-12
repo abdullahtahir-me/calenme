@@ -66,30 +66,7 @@ export function SiteHeader() {
         </div>
         <SearchForm className="w-auto md:w-2/6 inline-block" />
         <div className="flex gap-2">
-          <DropdownMenu onOpenChange={(open) => setChevron(open)}>
-            <DropdownMenuTrigger asChild>
-              <Button>
-                <Plus />
-                Open
-                <ChevronDown
-                  className={`ml-2 transition-transform duration-300 ${
-                    chevron ? "rotate-180" : "rotate-0"
-                  }`}
-                />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSignout}>
-                Sign Out
-              </DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
-              <DropdownMenuItem>Subscription</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          
           <Button variant="ghost">
             <Bell />
           </Button>
@@ -100,10 +77,19 @@ export function SiteHeader() {
               <Moon className="h-4 w-4" />
             )}
           </Button>
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
+          <DropdownMenu onOpenChange={(open) => setChevron(open)}>
+            <DropdownMenuTrigger asChild>
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                 <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={handleSignout}>
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
