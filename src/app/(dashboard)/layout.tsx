@@ -51,7 +51,7 @@ const items = [
   },
   {
     title: "Profile",
-    url: "/profile",
+    url: "#",
     icon: UserPen,
   },
 ];
