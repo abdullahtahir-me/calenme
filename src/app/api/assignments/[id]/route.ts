@@ -4,9 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 // --- DELETE HANDLER ---
 export async function DELETE(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Record<string, string> }
 ) {
-  const { id } = context.params;
+  const id = context.params.id;
 
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -43,9 +43,9 @@ export async function DELETE(
 // --- PATCH HANDLER ---
 export async function PATCH(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Record<string, string> }
 ) {
-  const { id } = context.params;
+  const id = context.params.id;
   const body = await request.json();
   const { is_submitted } = body;
 
