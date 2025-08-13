@@ -70,7 +70,6 @@ export default function Courses() {
   const [error, setError] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState("");
   const [addLoading, setAddLoading] = useState(false);
-  
 
   const fetchCourses = async () => {
     setLoading(true);
@@ -83,7 +82,7 @@ export default function Courses() {
       const data = await response.json();
       console.log("data fetched succgull");
       console.log(data);
-      setCourses(data===null?[]:data);
+      setCourses(data === null ? [] : data);
       setLoading(false);
     } catch (err) {
       if (err instanceof Error) {
@@ -168,10 +167,10 @@ export default function Courses() {
         // We convert our JavaScript object into a JSON string for transport.
         body: JSON.stringify(newCourse),
       });
-      
+
       // Get the response body as JSON
       const result = await response.json();
-      
+
       // Check if the HTTP response status is OK (e.g., 200, 201)
       if (!response.ok) {
         // If the server returned an error, log it to the console
@@ -185,7 +184,7 @@ export default function Courses() {
         // alert("Course created successfully! Check your database and the console.");
       }
       setShowAddDialog(false);
-      setAddLoading(false)
+      setAddLoading(false);
     } catch (error) {
       // This catches network errors (e.g., server is down, no internet)
       console.error("A network or fetch error occurred:", error);
@@ -221,7 +220,7 @@ export default function Courses() {
       alert("Error deleting the course.");
     }
     fetchCourses();
-    setDeleteLoading("")
+    setDeleteLoading("");
   };
 
   const getNextClassTime = (course: Course) => {
@@ -248,12 +247,12 @@ export default function Courses() {
               Add Course
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[90vw]">
             <DialogHeader>
               <DialogTitle>Add New Course</DialogTitle>
             </DialogHeader>
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name">Course Name</Label>
                   <Input
@@ -278,7 +277,7 @@ export default function Courses() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="instructor">Instructor</Label>
                   <Input
@@ -326,7 +325,7 @@ export default function Courses() {
 
               <div>
                 <Label>Course Color</Label>
-                <div className="flex gap-2 mt-2">
+                <div className="grid grid-cols-4 md:grid-cols-8 gap-2 mt-2 ml-5">
                   {colors.map((color) => (
                     <button
                       key={color}
@@ -383,12 +382,9 @@ export default function Courses() {
                     </div>
                   )}
 
-                  <div className="space-y-3">
+                  <div className="space-y-3 ">
                     {sessions.map((session, index) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-6 gap-2 items-end p-3 border rounded"
-                      >
+                      <div key={index} className="grid md:grid-cols-5 gap-2 items-end p-3 border rounded">
                         <div>
                           <Label className="text-xs">Day</Label>
                           <Select
@@ -490,7 +486,13 @@ export default function Courses() {
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleAddCourse}disabled={addLoading}>{addLoading ? <Loader2Icon className="animate-spin" /> : "Add Course"}</Button>
+                <Button onClick={handleAddCourse} disabled={addLoading}>
+                  {addLoading ? (
+                    <Loader2Icon className="animate-spin" />
+                  ) : (
+                    "Add Course"
+                  )}
+                </Button>
               </div>
             </div>
           </DialogContent>
@@ -551,18 +553,18 @@ export default function Courses() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {loading
           ? Array.from({ length: 9 }).map((_, i) => (
-                <Skeleton className="rounded-xl p-5 space-y-3" key={i}>
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="h-5 w-60 bg-zinc-200" />
-                    <Skeleton className="h-5 w-15 bg-zinc-200" />
-                  </div>
-                    <Skeleton className="h-4 w-30 bg-zinc-200" />
-                    <Skeleton className="h-30  bg-zinc-200" />
-                  <div className="flex space-x-3 justify-between">
-                    <Skeleton className="h-4 w-[150px] bg-zinc-200" />
-                    <Skeleton className="h-4 w-[50px] bg-zinc-200" />
-                  </div>
-                </Skeleton>
+              <Skeleton className="rounded-xl p-5 space-y-3" key={i}>
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-5 w-60 bg-zinc-200" />
+                  <Skeleton className="h-5 w-15 bg-zinc-200" />
+                </div>
+                <Skeleton className="h-4 w-30 bg-zinc-200" />
+                <Skeleton className="h-30  bg-zinc-200" />
+                <div className="flex space-x-3 justify-between">
+                  <Skeleton className="h-4 w-[150px] bg-zinc-200" />
+                  <Skeleton className="h-4 w-[50px] bg-zinc-200" />
+                </div>
+              </Skeleton>
             ))
           : courses.map((course) => (
               <Dialog key={course.id}>
@@ -630,7 +632,7 @@ export default function Courses() {
                   </Card>
                 </DialogTrigger>
 
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="w-[90vw] max-w-2xl">
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${course.color}`} />
@@ -729,8 +731,13 @@ export default function Courses() {
                   <Button
                     variant="destructive"
                     onClick={() => handleRemoveCourse(course.id)}
-                    disabled={deleteLoading==course.id}
-                  >{deleteLoading==course.id ? <Loader2Icon className="animate-spin" />: "Delete Course" }
+                    disabled={deleteLoading == course.id}
+                  >
+                    {deleteLoading == course.id ? (
+                      <Loader2Icon className="animate-spin" />
+                    ) : (
+                      "Delete Course"
+                    )}
                   </Button>
                 </DialogContent>
               </Dialog>

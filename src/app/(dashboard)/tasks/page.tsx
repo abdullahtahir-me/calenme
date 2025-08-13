@@ -156,13 +156,27 @@ export default function Tasks() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
         <div>
           <h1>Tasks</h1>
           <p className="text-muted-foreground">
             Manage your academic tasks and deadlines.
           </p>
         </div>
+      <div className="flex items-center justify-between">
+        {/* Filters */}
+      <div className="flex items-center gap-4">
+        <Filter className="h-4 w-4 text-muted-foreground" />
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Tasks</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogTrigger asChild>
@@ -230,21 +244,7 @@ export default function Tasks() {
         </Dialog>
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center gap-4">
-        <Filter className="h-4 w-4 text-muted-foreground" />
-        <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Tasks</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
+      
       {/* Tasks List */}
       <div className="space-y-4">
         {loading
@@ -286,39 +286,43 @@ export default function Tasks() {
                         >
                           {task.title}
                         </p>
-                        <p className="text-sm text-muted-foreground mt-1 md:max-w-[50vw]">
+                        <p className="text-sm text-muted-foreground text-justify w-[40vw] mt-1 md:max-w-[50vw]">
                           {task.description}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
+                        <div className="flex justify-center items-center max-sm:flex-col max-sm:items-end max-sm:space-y-2 space-x-2">
+
                         <Badge
                           variant={
                             task.priority === "high"
-                              ? "destructive"
-                              : task.priority === "medium"
-                              ? "default"
+                            ? "destructive"
+                            : task.priority === "medium"
+                            ? "default"
                               : "secondary"
                           }
-                        >
+                          >
                           {task.priority}
                         </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {task.due_date &&
-                            "Due:" +
-                              new Date(task.due_date).toLocaleDateString(
-                                "en-US",
+                        {task.due_date &&
+                        <Badge variant="outline" className="text-sm text-muted-foreground">
+                          
+                            
+                            {new Date(task.due_date).toLocaleDateString(
+                              "en-US",
                                 {
                                   year: "numeric",
                                   month: "long",
                                   day: "numeric",
                                 }
                               )}
-                        </span>
+                        </Badge>}
+                        </div>
                         <Button
                           variant="ghost"
                           className="w-7 h-7 hover:bg-gray-50 flex p-0 items-center justify-center"
                           onClick={() => handleRemoveTask(task.id)}
-                        >
+                          >
                           {" "}
                           {task.id == deleteId ? (
                             // >{true ?

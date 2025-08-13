@@ -1,5 +1,5 @@
 "use client"
-import { Calendar, Home, Settings, BookOpen, SquareCheckBig, ClipboardList } from "lucide-react"
+import { Calendar, Home, BookOpen, SquareCheckBig, ClipboardList, UserPen } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -41,9 +41,9 @@ const items = [
     icon: Calendar,
   },
   {
-    title: "Settings",
-    url: "#",
-    icon: Settings
+    title: "Profile",
+    url: "/profile",
+    icon: UserPen
   }
 ]
 
