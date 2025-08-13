@@ -25,3 +25,5 @@ export const config = {
     "/((?!_next/static|api/auth|_next/image|favicon.ico|login|signup|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
+
+export const runtime = 'nodejs';
