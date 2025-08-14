@@ -47,37 +47,37 @@ export async function PATCH(
 
 
 // --- DELETE — delete an assignment ---
-export async function DELETE(
-  request: NextRequest,
-  // FIX #1: Correct the function signature
-  { params }: { params: { id: string } }
-) {
-  // FIX #1: Access id directly, no await
-  const id = params.id;
-  const supabase = await createClient();
+// export async function DELETE(
+//   request: NextRequest,
+//   // FIX #1: Correct the function signature
+//   { params }: { params: { id: string } }
+// ) {
+//   // FIX #1: Access id directly, no await
+//   const id = params.id;
+//   const supabase = await createClient();
 
-  // FIX #2: Add authentication check
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+//   // FIX #2: Add authentication check
+//   const { data: { user }, error: authError } = await supabase.auth.getUser();
+//   if (authError || !user) {
+//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//   }
 
-  const { data, error } = await supabase
-    .from("assignments")
-    .delete()
-    // FIX #3: Add the critical security check for user_id
-    .eq("id", id)
-    .eq("user_id", user.id)
-    .select()
-    .single();
+//   const { data, error } = await supabase
+//     .from("assignments")
+//     .delete()
+//     // FIX #3: Add the critical security check for user_id
+//     .eq("id", id)
+//     .eq("user_id", user.id)
+//     .select()
+//     .single();
 
-  if (error) {
-    console.error("Supabase delete error:", error);
-    if (error.code === 'PGRST116') {
-      return NextResponse.json({ error: "Assignment not found or permission denied." }, { status: 404 });
-    }
-    return NextResponse.json({ error: "Failed to delete assignment." }, { status: 500 });
-  }
+//   if (error) {
+//     console.error("Supabase delete error:", error);
+//     if (error.code === 'PGRST116') {
+//       return NextResponse.json({ error: "Assignment not found or permission denied." }, { status: 404 });
+//     }
+//     return NextResponse.json({ error: "Failed to delete assignment." }, { status: 500 });
+//   }
 
-  return NextResponse.json(data, { status: 200 });
-}
+//   return NextResponse.json(data, { status: 200 });
+// }
