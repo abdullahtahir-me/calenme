@@ -1,10 +1,10 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function DELETE(request:NextRequest, {params}:{
-    params : {id :string}
-}) {
-    const id = (await params).id;
+export async function DELETE(request:NextRequest, { params }: { params: Promise<{ id: string }> }
+) {
+  // FIX #1: Access id directly, no await
+  const {id} = await params;
     console.log(id);
     const supabase = await createClient();
       const { data: { user }, error: authError } = await supabase.auth.getUser();
