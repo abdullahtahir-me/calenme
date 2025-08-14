@@ -5,10 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 export async function PATCH(
   request: NextRequest,
   // FIX #1: Correct the function signature
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // FIX #1: Access id directly, no await
-  const id = params.id;
+  const {id} = await params;
   const body = await request.json();
   const { is_submitted } = body; // Match the column name for clarity
 
