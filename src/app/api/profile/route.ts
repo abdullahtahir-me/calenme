@@ -10,14 +10,15 @@ export async function GET(request:NextRequest) {
     
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get("query")
-
+    console.log("query: "+query);
     if(query=="avatar"){
-        const { data: avatar_index , error } = await supabase.from('profiles').select('avatar_index').eq('id',user.id);
+        const { data: avatar_index , error } = await supabase.from('profiles').select('avatar_index').eq('id',user.id).single();
+        
     if(error){
-        console.log(error);
+        console.log("error: "+ error.message);
         return NextResponse.json(error, {status: 400});
     }
-    console.log(avatar_index)
+    console.log("Ava index: "+avatar_index)
     return NextResponse.json(avatar_index, {status: 200});
     }
 

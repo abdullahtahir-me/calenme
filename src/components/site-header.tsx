@@ -40,6 +40,7 @@ export function SiteHeader() {
           throw new Error("Avatar failed to load");
         }
         const data = await response.json();
+        console.log(data);
         if (Array.isArray(data) && data.length > 0 && data[0].avatar_index) {
         setAvaIndex(String(data[0].avatar_index));
       } else {

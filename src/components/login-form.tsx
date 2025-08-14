@@ -116,8 +116,8 @@ export function LoginForm({
               {/* --- OAUTH BUTTONS --- */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* --- FIX: Use a Link styled as a Button for Google OAuth --- */}
-                <Link href="/api/auth/login/googleSignin" passHref legacyBehavior>
-                  <a onClick={() => setIsGoogleLoading(true)}>
+                <Link href="/api/auth/login/googleSignin" passHref onClick={() => setIsGoogleLoading(true)}>
+                  
                     <Button variant="outline" type="button" className="w-full" disabled={isFormLoading || isGoogleLoading}>
                       {isGoogleLoading ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -131,7 +131,7 @@ export function LoginForm({
                       )}
                       Google
                     </Button>
-                  </a>
+                  
                 </Link>
 
                 {/* GitHub button can be implemented the same way */}

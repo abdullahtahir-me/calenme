@@ -258,7 +258,7 @@ export default function Tasks() {
                       <Skeleton className="h-4 w-[300px] bg-zinc-200" />
                     </div>
                   </div>
-                  <div className="flex space-x-3">
+                  <div className="max-sm:hidden flex space-x-3">
                     <Skeleton className="h-4 w-[50px] bg-zinc-200" />
                     <Skeleton className="h-4 w-[150px] bg-zinc-200" />
                   </div>

@@ -114,8 +114,8 @@ export function SignupForm({
               {/* --- GOOGLE & GITHUB BUTTONS --- */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Use a Link styled as a button for the server-side OAuth flow */}
-                <Link href="/api/auth/login/googleSignin" passHref legacyBehavior>
-                  <a onClick={() => setIsGoogleLoading(true)}>
+                <Link href="/api/auth/login/googleSignin" passHref onClick={() => setIsGoogleLoading(true)}>
+                  
                     <Button variant="outline" type="button" className="w-full" disabled={isFormLoading || isGoogleLoading}>
                       {isGoogleLoading ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -129,7 +129,7 @@ export function SignupForm({
                       )}
                       Google
                     </Button>
-                  </a>
+                  
                 </Link>
                 
                 {/* You can add a similar Link for GitHub */}

@@ -68,7 +68,7 @@ export default async function RootLayout({
         <div className="flex flex-1">
           <AppSidebar />
           <SidebarInset>
-            <div className="flex flex-1 flex-col gap-4 p-4s">
+            <div className="flex flex-1 flex-col gap-4 p-4s max-sm:pb-17 ">
               <div className="fixed bottom-5 left-0 w-full flex justify-center sm:hidden z-50">
                 <Tabs defaultValue="Dashboard" className="w-auto">
                   <TabsList className="bg-white/30 backdrop-blur-lg h-13">
