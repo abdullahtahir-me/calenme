@@ -48,7 +48,6 @@ export async function PATCH(
 
 // --- DELETE — delete an assignment ---
 export async function DELETE(
-  request: NextRequest,
   // FIX #1: Correct the function signature
   { params }: { params: { id: string } }
 ) {
