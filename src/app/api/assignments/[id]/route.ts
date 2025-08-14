@@ -4,9 +4,9 @@ import { createClient } from "@/utils/supabase/server";
 // PATCH — update an assignment
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const body = await request.json();
   const { toggledState } = body;
 
@@ -27,9 +27,9 @@ export async function PATCH(
 // DELETE — delete an assignment
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   const supabase = await createClient();
 
@@ -40,7 +40,7 @@ export async function DELETE(
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
-    
+
   }
 
   return NextResponse.json({ message: "Assignment deleted successfully" });
