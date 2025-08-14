@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
-type RouteContext = {
-  params: { id: string };
-};
-
 // PATCH — update an assignment
-export async function PATCH(request: NextRequest, context: RouteContext) {
-  const { id } = context.params;
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params;
   const body = await request.json();
   const { toggledState } = body;
 
@@ -26,8 +25,11 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 }
 
 // DELETE — delete an assignment
-export async function DELETE(request: NextRequest, context: RouteContext) {
-  const { id } = context.params;
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params;
 
   const supabase = await createClient();
 
