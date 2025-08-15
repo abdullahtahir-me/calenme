@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Pencil, User } from "lucide-react";
+import { Loader2Icon, Pencil, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -29,7 +29,9 @@ type ProfileData = {
 
 export default function Profile() {
   const [readOnly, setReadOnly] = useState(true);
+  const [avatarDialog,setAvatarDialog] = useState(false);
   const [ava, setAva] = useState(1);
+  const [saveLoading, setSaveLoading] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({
     id: "",
     full_name: "",
@@ -54,6 +56,7 @@ export default function Profile() {
     }
   };
   const submitData = async () => {
+    setSaveLoading(true);
     console.log(profileData);
     try {
       const response = await fetch("/api/profile",{
@@ -68,6 +71,7 @@ export default function Profile() {
       console.log(error);
     }
     fetchData();
+    setSaveLoading(false);
   }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -81,6 +85,7 @@ export default function Profile() {
   };
   const setAvatar = (id: number) => {
     console.log(id);
+    setAvatarDialog(false);
     profileData.avatar_index = id;
   };
 
@@ -98,9 +103,9 @@ export default function Profile() {
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="grid place-items-center  gap-6 m-6">
       {/* Profile Settings */}
-      <Card className="lg:col-span-2 p-6">
+      <Card className="min-w-[50vw] min p-6">
         <div className="space-y-6">
           <div className="flex items-center gap-2">
             <User className="h-5 w-5" />
@@ -116,16 +121,16 @@ export default function Profile() {
               <AvatarFallback>AT</AvatarFallback>
             </Avatar>
             <div className="flex justify-between w-full">
-              <Dialog>
+              <Dialog open={avatarDialog} onOpenChange={setAvatarDialog}>
                 <DialogTrigger asChild>
                   <Button variant="outline" disabled={readOnly} size="sm">
                     Change Photo
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Are you absolutely sure?</DialogTitle>
-                    <DialogDescription>
+                  <DialogHeader className="space-y-6">
+                    <DialogTitle>Reflect yourself.</DialogTitle>
+                    {/* <DialogDescription> */}
                       <RadioGroup
                         defaultValue={`${profileData.avatar_index}`}
                         className="grid grid-cols-3 md:grid-cols-5"
@@ -154,7 +159,7 @@ export default function Profile() {
                           );
                         })}
                       </RadioGroup>
-                    </DialogDescription>
+                    {/* </DialogDescription> */}
                   </DialogHeader>
                   <DialogFooter>
                     <DialogClose asChild>
@@ -217,7 +222,7 @@ export default function Profile() {
               />
             </div>
 
-            <Button disabled={readOnly} onClick={submitData}>Save Changes</Button>
+            <Button disabled={readOnly || saveLoading} onClick={submitData}>{saveLoading?  <Loader2Icon className="animate-spin"/> :"Save Changes"}</Button>
           </div>
         </div>
       </Card>
