@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   // --- FIX #1: Correctly parse the JSON body ---
   const requestData = await request.json();
   const { title, description, priority, dueDate } = requestData; // No 'await' here
-  console.log(requestData);
+  // console.log(requestData);
   const supabase = await createClient();
   const { data, error: authError } = await supabase.auth.getUser();
 
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  console.log("Newly created task:", newTask);
+  // console.log("Newly created task:", newTask);
   return NextResponse.json(newTask, { status: 201 });
 }
 

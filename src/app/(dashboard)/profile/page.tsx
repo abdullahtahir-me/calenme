@@ -49,7 +49,7 @@ export default function Profile() {
       const response = await fetch("/api/profile");
       if (!response.ok) throw new Error("Response not found");
       const data = await response.json();
-      console.log(data);
+    //   console.log(data);
       setProfileData(data);
     } catch (error) {
       console.log(error);
@@ -57,7 +57,7 @@ export default function Profile() {
   };
   const submitData = async () => {
     setSaveLoading(true);
-    console.log(profileData);
+    // console.log(profileData);
     try {
       const response = await fetch("/api/profile",{
         method: "PATCH",
@@ -84,7 +84,7 @@ export default function Profile() {
     readOnly ? setReadOnly(false) : setReadOnly(true);
   };
   const setAvatar = (id: number) => {
-    console.log(id);
+    // console.log(id);
     setAvatarDialog(false);
     profileData.avatar_index = id;
   };

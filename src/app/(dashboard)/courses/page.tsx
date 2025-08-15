@@ -74,14 +74,14 @@ export default function Courses() {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      console.log("fetching the data");
+      // console.log("fetching the data");
       const response = await fetch("/api/courses");
       if (!response.ok) {
         throw new Error("Error fetching the results");
       }
       const data = await response.json();
-      console.log("data fetched succgull");
-      console.log(data);
+      // console.log("data fetched succgull");
+      // console.log(data);
       setCourses(data === null ? [] : data);
       setLoading(false);
     } catch (err) {
@@ -156,8 +156,8 @@ export default function Courses() {
   const handleAddCourse = async () => {
     setAddLoading(true);
     newCourse.sessions = sessions;
-    console.log("Sending the following data to the API:", newCourse);
-    console.log(sessions);
+    // console.log("Sending the following data to the API:", newCourse);
+    // console.log(sessions);
     try {
       const response = await fetch("/api/courses", {
         method: "POST",
@@ -179,7 +179,7 @@ export default function Courses() {
         alert("Failed to create course. Check the console for details.");
       } else {
         // If the request was successful, log the new course data returned by the server
-        console.log("Success! Server responded with:", result);
+        // console.log("Success! Server responded with:", result);
         fetchCourses();
         // alert("Course created successfully! Check your database and the console.");
       }
@@ -208,7 +208,7 @@ export default function Courses() {
 
   const handleRemoveCourse = async (id: string) => {
     setDeleteLoading(id);
-    console.log("delete course request");
+    // console.log("delete course request");
     const response = await fetch(`/api/courses/${id}`, {
       method: "DELETE",
       headers: {

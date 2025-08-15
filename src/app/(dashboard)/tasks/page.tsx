@@ -126,7 +126,7 @@ export default function Tasks() {
   };
   const handleRemoveTask = async (id: string) => {
     setDeleteId(id);
-    console.log("delete course request");
+    // console.log("delete course request");
     const response = await fetch(`/api/tasks/${id}`, {
       method: "DELETE",
       headers: {

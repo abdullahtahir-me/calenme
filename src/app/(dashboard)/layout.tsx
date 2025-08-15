@@ -7,7 +7,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Home,
   SquareCheckBig,

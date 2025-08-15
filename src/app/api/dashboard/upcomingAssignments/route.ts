@@ -8,7 +8,7 @@ export async function GET() {
         error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-        console.log(authError);
+        // console.log(authError);
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
@@ -16,7 +16,7 @@ export async function GET() {
     if(error){
         return NextResponse.json(error, {status: 400});
     }
-    console.log(upcommingClasses);
+    // console.log(upcommingClasses);
     return NextResponse.json(upcommingClasses, {status: 200});
 
 }

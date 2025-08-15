@@ -11,7 +11,7 @@ export async function GET(request:NextRequest) {
 
     const { data: assignmentData , error } = await supabase.rpc("get_assignments_with_courses");
     if(error){
-        console.log(error);
+        // console.log(error);
         return NextResponse.json(error, {status: 400});
     }
     return NextResponse.json(assignmentData, {status: 201});
@@ -23,7 +23,7 @@ export async function GET(request:NextRequest) {
 export async function POST(request:NextRequest) {
     const assignmentData = await request.json();
     const { title, description, type, course_id, dueDate } = assignmentData;
-    console.log({ title, description, type, course_id, dueDate });
+    // console.log({ title, description, type, course_id, dueDate });
     const supabase = await createClient();
     const { data: {user}, error: authError } = await supabase.auth.getUser();
     if (authError || !user){
@@ -40,7 +40,7 @@ export async function POST(request:NextRequest) {
     }).select().single();
 
     if(insertError){
-        console.log(insertError);
+        // console.log(insertError);
         return NextResponse.json(insertError, {status: 400});
     }
     return NextResponse.json(data, {status: 201});

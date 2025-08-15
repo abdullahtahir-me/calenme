@@ -1,5 +1,5 @@
 "use client";
-import { Bell, ConciergeBellIcon, Moon, SidebarIcon, Sun } from "lucide-react";
+import { Bell, Moon, SidebarIcon, Sun } from "lucide-react";
 import avatar1 from "@/assets/images/1.jpg";
 import avatar2 from "@/assets/images/2.jpg";
 import avatar3 from "@/assets/images/3.jpg";
@@ -11,7 +11,7 @@ import avatar8 from "@/assets/images/8.jpg";
 import avatar9 from "@/assets/images/9.jpg";
 import avatar10 from "@/assets/images/10.jpg";
 import { useRouter } from "next/navigation";
-import { SearchForm } from "@/components/search-form";
+// import { SearchForm } from "@/components/search-form";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +22,6 @@ import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useEffect, useMemo, useState } from "react";
-import { StaticImageData } from "next/image";
 
 export function SiteHeader() {
   const [avaIndex, setAvaIndex] = useState<string | null>(null);
@@ -105,10 +104,10 @@ export function SiteHeader() {
             <SidebarIcon />
           </Button>
           <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-            Lag Gae Guru
+            Calenme
           </h3>
         </div>
-        <SearchForm className="w-auto hidden md:w-2/6 md:inline-block" />
+        {/* <SearchForm className="w-auto hidden md:w-2/6 md:inline-block" /> */}
         <div className="flex gap-2">
           <Button variant="ghost">
             <Bell />

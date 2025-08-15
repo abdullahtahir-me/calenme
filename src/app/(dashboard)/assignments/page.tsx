@@ -104,7 +104,7 @@ export default function Assignments() {
     const response = await fetch("/api/courses?query=coursesName");
     if (!response.ok) console.log("error loading the courses details");
     const data = await response.json();
-    console.log(data);
+    // console.log(data);
     setCourses(data);
   };
 
@@ -121,7 +121,7 @@ export default function Assignments() {
 
   const handleAddAssignment = async () => {
     setAddLoading(true);
-    console.log(newAssignment);
+    // console.log(newAssignment);
     const response = await fetch("/api/assignments", {
       method: "POST",
       headers: {
@@ -150,7 +150,7 @@ export default function Assignments() {
   };
   const handleRemoveAssignment = async (id: string) => {
     setDeleteLoading(id);
-    console.log("delete course request");
+    // console.log("delete course request");
     const response = await fetch(`/api/assignments/${id}`, {
       method: "DELETE",
       headers: {

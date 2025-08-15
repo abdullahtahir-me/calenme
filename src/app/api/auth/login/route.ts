@@ -13,10 +13,10 @@ export async function POST(request:NextRequest) {
     })
     
     if(error){
-        console.log("supabase login error" + error)
+        // console.log("supabase login error" + error)
         return NextResponse.json({error: "Invalid credentials " + error.message}, {status: 401})
     }
-    console.log(data)
+    // console.log(data)
 
     return NextResponse.json({message: "Login Successful", session: data.session}, {status: 200})
 }

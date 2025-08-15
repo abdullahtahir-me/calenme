@@ -10,21 +10,21 @@ export async function GET(request:NextRequest) {
     
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get("query")
-    console.log("query: "+query);
+    // console.log("query: "+query);
     if(query=="avatar"){
         const { data: avatar_index , error } = await supabase.from('profiles').select('avatar_index').eq('id',user.id).single();
         
     if(error){
-        console.log("error: "+ error.message);
+        // console.log("error: "+ error.message);
         return NextResponse.json(error, {status: 400});
     }
-    console.log("Ava index: "+avatar_index)
+    // console.log("Ava index: "+avatar_index)
     return NextResponse.json(avatar_index, {status: 200});
     }
 
     const { data: profileData , error } = await supabase.from('profiles').select('*').eq('id',user.id).single();
     if(error){
-        console.log(error);
+        // console.log(error);
         return NextResponse.json(error, {status: 400});
     }
     return NextResponse.json(profileData, {status: 200});
@@ -33,7 +33,7 @@ export async function GET(request:NextRequest) {
 
 export async function PATCH(request: NextRequest) {
     const requestData = await request.json();
-    console.log(requestData);
+    // console.log(requestData);
     const dataToBeUpdated = {
         full_name:  requestData.full_name,
         student_id: requestData.student_id,

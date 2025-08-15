@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user) {
-    console.log(authError);
+    // console.log(authError);
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
@@ -32,6 +32,6 @@ export async function GET(request: NextRequest) {
     tasks: tasksRes.count ?? 0,
     assignments: assignmentsRes.count ?? 0,
   };
-  console.log(stats);
+  // console.log(stats);
   return NextResponse.json(stats);
 }

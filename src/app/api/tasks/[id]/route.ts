@@ -40,7 +40,7 @@ export async function DELETE(request:NextRequest, { params }: { params: Promise<
 ) {
   // FIX #1: Access id directly, no await
   const {id} = await params;
-    console.log(id);
+    // console.log(id);
     const supabase = await createClient();
       const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -57,7 +57,7 @@ export async function DELETE(request:NextRequest, { params }: { params: Promise<
         .single();
     
       if (error) {
-        console.log(error);
+        // console.log(error);
         return NextResponse.json({ error: error.message }, { status: 400 });
       }
     

@@ -17,14 +17,14 @@ export async function GET(request: NextRequest) {
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user) {
-    console.log(authError);
+    // console.log(authError);
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   if (query === "coursesName") {
     const { data: courses, error } = await supabase.from('courses').select('id,title,code').eq('user_id', user.id);
     if (error) {
-      console.log(error);
+      // console.log(error);
       return NextResponse.json(error, { status: 400 });
     }
     return NextResponse.json(courses, { status: 200 });
@@ -58,15 +58,15 @@ export async function POST(request: NextRequest) {
     color,
     sessions,
   } = await request.json();
-  console.log(
-    "Courses from the outgoing route in backend" + courseName,
-    courseCode,
-    instructor,
-    credits,
-    description,
-    color,
-    sessions
-  );
+  // console.log(
+  //   "Courses from the outgoing route in backend" + courseName,
+  //   courseCode,
+  //   instructor,
+  //   credits,
+  //   description,
+  //   color,
+  //   sessions
+  // );
   const supabase = await createClient();
   const {
     data: { user },

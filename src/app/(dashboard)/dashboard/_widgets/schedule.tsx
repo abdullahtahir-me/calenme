@@ -40,7 +40,7 @@ export default function ScheduleWidget() {
     setUpcomingClasses(data===null? [] : data);
     setLoading(false);
     setError(false);
-    console.log(data);
+    // console.log(data);
   };
 
   return loading ? (

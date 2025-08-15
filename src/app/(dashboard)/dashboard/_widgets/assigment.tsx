@@ -34,7 +34,7 @@ export default function AssignmentWidget() {
     setUpcomingAssignments(data===null? [] : data);
     setLoading(false)
     setError(false);
-    console.log(data);
+    // console.log(data);
     
   }
 
