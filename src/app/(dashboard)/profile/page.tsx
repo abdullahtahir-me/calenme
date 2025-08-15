@@ -53,8 +53,21 @@ export default function Profile() {
       console.log(error);
     }
   };
-  const submitData = () => {
-    console.log(profileData)
+  const submitData = async () => {
+    console.log(profileData);
+    try {
+      const response = await fetch("/api/profile",{
+        method: "PATCH",
+        headers:{
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(profileData),
+      });
+      if (!response.ok) throw new Error("Response not found");
+    } catch (error) {
+      console.log(error);
+    }
+    fetchData();
   }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;

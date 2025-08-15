@@ -29,3 +29,27 @@ export async function GET(request:NextRequest) {
     }
     return NextResponse.json(profileData, {status: 200});
 }
+
+
+export async function PATCH(request: NextRequest) {
+    const requestData = await request.json();
+    console.log(requestData);
+    const dataToBeUpdated = {
+        full_name:  requestData.full_name,
+        student_id: requestData.student_id,
+        dob: requestData.dob,
+        avatar_index: requestData.avatar_index,
+    }
+    const supabase = await createClient();
+    const { data: {user}, error: authError } = await supabase.auth.getUser();
+    if (authError || !user){
+        return NextResponse.json({meassage: "Unauthorized"}, {status:401});
+    }
+    const { data: updateData, error: updateError } = await supabase.from('profiles').update(dataToBeUpdated).eq('id', user.id).single();
+    if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ updateData }, { status: 201 });
+    
+}
