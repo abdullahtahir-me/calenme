@@ -44,11 +44,11 @@ const items = [
     url: "/courses",
     icon: BookOpen,
   },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
+  // {
+  //   title: "Calendar",
+  //   url: "#",
+  //   icon: Calendar,
+  // },
   {
     title: "Profile",
     url: "/profile",
