@@ -22,7 +22,7 @@ export async function GET(request:NextRequest) {
     return NextResponse.json(avatar_index, {status: 200});
     }
 
-    const { data: profileData , error } = await supabase.from('profiles').select('*').eq('id',user.id);
+    const { data: profileData , error } = await supabase.from('profiles').select('*').eq('id',user.id).single();
     if(error){
         console.log(error);
         return NextResponse.json(error, {status: 400});

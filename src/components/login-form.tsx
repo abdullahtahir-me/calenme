@@ -114,11 +114,11 @@ export function LoginForm({
               </div>
 
               {/* --- OAUTH BUTTONS --- */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                 {/* --- FIX: Use a Link styled as a Button for Google OAuth --- */}
                 <Link href="/api/auth/login/googleSignin" passHref onClick={() => setIsGoogleLoading(true)}>
                   
-                    <Button variant="outline" type="button" className="w-full" disabled={isFormLoading || isGoogleLoading}>
+                    <Button variant="destructive" type="button" className="w-full" disabled={isFormLoading || isGoogleLoading}>
                       {isGoogleLoading ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
@@ -134,11 +134,11 @@ export function LoginForm({
                   
                 </Link>
 
-                {/* GitHub button can be implemented the same way */}
+                {/* GitHub button can be implemented the same way 
                 <Button variant="outline" type="button" className="w-full" disabled={true}>
-                   {/* Your GitHub icon */}
+                   {/* Your GitHub icon 
                   GitHub
-                </Button>
+                </Button> */}
               </div>
               
               <div className="text-center text-sm">
